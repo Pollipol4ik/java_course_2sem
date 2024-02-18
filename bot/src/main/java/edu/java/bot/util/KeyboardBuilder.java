@@ -1,4 +1,4 @@
-package edu.java.bot.keyboard_builder;
+package edu.java.bot.util;
 
 
 import com.pengrad.telegrambot.model.request.InlineKeyboardButton;

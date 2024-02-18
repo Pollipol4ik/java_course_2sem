@@ -1,6 +1,7 @@
 app:
   telegram-token: //your token must be here
 
+
 spring:
   application:
     name: bot
