@@ -1,11 +1,9 @@
 package edu.java.bot.command;
 
-
 import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
 import static edu.java.bot.util.MessagesUtils.ERROR_MESSAGE;
 
 @RequiredArgsConstructor

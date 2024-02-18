@@ -43,7 +43,7 @@ public class ListCommandTest {
             )
         ));
 
-        SendMessage actual = commandExecutor.execute(LIST.getCommandName(), chatId);
+        SendMessage actual = commandExecutor.execute(LIST.getName(), chatId);
 
         Assertions.assertThat(actual.getParameters().get("text")).isEqualTo(TRACKED_LINKS);
     }
@@ -54,7 +54,7 @@ public class ListCommandTest {
         long chatId = 1;
         Mockito.when(linkService.getAllTrackedLinks(chatId)).thenReturn(Collections.emptyList());
 
-        SendMessage actual = commandExecutor.execute(LIST.getCommandName(), chatId);
+        SendMessage actual = commandExecutor.execute(LIST.getName(), chatId);
 
         Assertions.assertThat(actual.getParameters().get("text"))
             .isEqualTo(NO_TRACKED_LINKS);

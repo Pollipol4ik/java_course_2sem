@@ -18,7 +18,7 @@ public class HelpCommand extends CommandExecutor {
     }
 
     private boolean isHelpCommand(String command) {
-        return command.equals(Command.HELP.getCommandName());
+        return command.equals(Command.HELP.getName());
     }
 
     private SendMessage createHelpResponse(long chatId) {

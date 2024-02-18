@@ -50,10 +50,10 @@ public class BotConfiguration {
     @Bean
     public BotCommand[] commands() {
         return new BotCommand[] {
-            new BotCommand(TRACK.getCommandName(), TRACK.getCommandDescription()),
-            new BotCommand(UNTRACK.getCommandName(), UNTRACK.getCommandDescription()),
-            new BotCommand(LIST.getCommandName(), LIST.getCommandDescription()),
-            new BotCommand(HELP.getCommandName(), HELP.getCommandDescription())
+            new BotCommand(TRACK.getName(), TRACK.getDescription()),
+            new BotCommand(UNTRACK.getName(), UNTRACK.getDescription()),
+            new BotCommand(LIST.getName(), LIST.getDescription()),
+            new BotCommand(HELP.getName(), HELP.getDescription())
         };
     }
 

@@ -13,6 +13,7 @@ import static edu.java.bot.util.MessagesUtils.LINK_HAS_BEEN_UNTRACKED;
 public class UpdateCallbackResolver extends UpdateResolver {
 
     private final CommandService commandService;
+    private static final String FORMAT_ERROR = "Invalid callback data format";
 
     @Override
     public SendMessage resolve(Update update) {
@@ -29,7 +30,7 @@ public class UpdateCallbackResolver extends UpdateResolver {
 
     private void processCallback(long userId, String callbackData) {
         if (!isValidCallbackData(callbackData)) {
-            throw new IllegalArgumentException("Invalid callback data format");
+            throw new IllegalArgumentException(FORMAT_ERROR);
         }
         UUID linkId = extractLinkId(callbackData);
         commandService.untrackLink(userId, linkId);
@@ -42,7 +43,7 @@ public class UpdateCallbackResolver extends UpdateResolver {
     private UUID extractLinkId(String data) {
         String[] parts = data.split(":");
         if (parts.length != 2) {
-            throw new IllegalArgumentException("Invalid callback data format");
+            throw new IllegalArgumentException(FORMAT_ERROR);
         }
         return UUID.fromString(parts[1]);
     }

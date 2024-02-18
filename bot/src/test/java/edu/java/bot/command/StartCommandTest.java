@@ -15,7 +15,7 @@ public class StartCommandTest {
     public void execute_shouldReturnCorrectMessage() {
         StartCommand commandExecutor = new StartCommand();
 
-        SendMessage actual = commandExecutor.execute(START.getCommandName(), 1);
+        SendMessage actual = commandExecutor.execute(START.getName(), 1);
 
         Assertions.assertThat(actual.getParameters().get("text")).isEqualTo(WELCOME_MESSAGE);
     }

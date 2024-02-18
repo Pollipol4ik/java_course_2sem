@@ -16,7 +16,7 @@ public class HelpCommandTest {
     public void execute_shouldReturnCorrectMessage() {
         HelpCommand testExecutor = new HelpCommand();
 
-        SendMessage actual = testExecutor.execute(HELP.getCommandName(), 1);
+        SendMessage actual = testExecutor.execute(HELP.getName(), 1);
 
         Assertions.assertThat(actual.getParameters().get("text")).isEqualTo(HELP_MESSAGE);
         Assertions.assertThat(actual.getParameters().get("chat_id")).isEqualTo(1L);

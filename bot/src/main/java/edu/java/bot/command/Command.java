@@ -12,6 +12,6 @@ public enum Command {
     UNTRACK("/untrack", "Прекратить отслеживание обновлений ссылки ⛔"),
     LIST("/list", "Просмотреть список отслеживаемых ссылок 📋");
 
-    private final String commandName;
-    private final String commandDescription;
+    private final String name;
+    private final String description;
 }
