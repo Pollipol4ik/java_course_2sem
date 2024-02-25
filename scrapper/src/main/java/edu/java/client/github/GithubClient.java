@@ -9,12 +9,12 @@ import java.util.regex.Pattern;
 
 public class GithubClient extends AbstractWebClient {
 
-    private static final String BASE_URL = "https://api.github.com/";
-    private static final Pattern REPOSITORY_PATTERN = Pattern.compile("https://github.com/(.+)/(.+)");
+    private static final String GITHUB_API_BASE_URL = "https://api.github.com/";
+    private static final Pattern GITHUB_REPOSITORY_PATTERN = Pattern.compile("https://github.com/(.+)/(.+)");
     private final GithubService service;
 
     public GithubClient() {
-        this(BASE_URL);
+        this(GITHUB_API_BASE_URL);
     }
 
     public GithubClient(String baseUrl) {
@@ -29,7 +29,7 @@ public class GithubClient extends AbstractWebClient {
 
     @Override
     public LastUpdateTime receiveLastUpdateTime(String link) {
-        Matcher matcher = REPOSITORY_PATTERN.matcher(link);
+        Matcher matcher = GITHUB_REPOSITORY_PATTERN.matcher(link);
         if (!matcher.find()) {
             return null;
         }
