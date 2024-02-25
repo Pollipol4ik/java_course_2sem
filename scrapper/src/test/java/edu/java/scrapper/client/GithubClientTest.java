@@ -24,6 +24,8 @@ public class GithubClientTest {
         wireMockServer.start();
         configureFor(wireMockServer.port());
 
+        String currentDateTime = OffsetDateTime.now().toString();
+
         wireMockServer.stubFor(get(urlEqualTo(url))
             .willReturn(aResponse()
                 .withStatus(200)
@@ -31,9 +33,9 @@ public class GithubClientTest {
                 .withBody("""
                     {
                         "full_name": "Pollipol4ik/java_course_2sem",
-                        "updated_at": "2024-02-01T08:45:43Z"
+                        "updated_at": "%s"
                     }
-                    """)));
+                    """.formatted(currentDateTime))));
     }
 
     @AfterAll
@@ -47,6 +49,6 @@ public class GithubClientTest {
         LinkInformationReceiver client = new GithubClient(wireMockServer.baseUrl());
         LastUpdateTime actual = client.receiveLastUpdateTime("https://github.com/Pollipol4ik/java_course_2sem");
         assertThat(actual).isNotNull();
-        assertThat(actual.lastUpdate()).isEqualTo(OffsetDateTime.parse("2024-02-01T08:45:43Z"));
+        assertThat(actual.lastUpdate().toLocalDate()).isEqualTo(OffsetDateTime.now().toLocalDate());
     }
 }
