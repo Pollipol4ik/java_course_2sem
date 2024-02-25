@@ -8,6 +8,6 @@ public class LinkUpdaterScheduler {
 
     @Scheduled(fixedDelayString = "${app.scheduler.interval}")
     public void update() {
-        log.info("Update has been started");
+        log.info("Update initiated");
     }
 }

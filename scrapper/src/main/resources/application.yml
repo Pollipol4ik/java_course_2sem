@@ -4,6 +4,12 @@ app:
     interval: 10000
     force-check-delay: 10000
 
+client:
+  stackoverflow:
+   base-url:
+  github:
+    base-url:
+
 spring:
   application:
     name: scrapper
