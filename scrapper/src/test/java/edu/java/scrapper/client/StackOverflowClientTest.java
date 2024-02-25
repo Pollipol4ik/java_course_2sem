@@ -23,7 +23,7 @@ public class StackOverflowClientTest {
 
     @BeforeAll
     public static void setUp() {
-        String url = "/questions/13133695?site=stackoverflow";
+        String url = "/questions/78055703?site=stackoverflow";
         wireMockServer = new WireMockServer(wireMockConfig().dynamicPort());
         wireMockServer.stubFor(get(urlEqualTo(url))
             .willReturn(aResponse()
@@ -33,7 +33,7 @@ public class StackOverflowClientTest {
                     {
                         "items": [
                             {
-                                "title": "IncompatibleClassChangeError with Eclipse Jetty",
+                                "title": "Principle of Reverse Proxy with docker-compose",
                                 "last_activity_date": 1352102450
                             }
                         ]
@@ -54,7 +54,7 @@ public class StackOverflowClientTest {
             new StackOverflowClient(wireMockServer.baseUrl());
 
         LastUpdateTime actual =
-            stackOverflowClient.receiveLastUpdateTime("https://stackoverflow.com/questions/13133695/weorhfweor");
+            stackOverflowClient.receiveLastUpdateTime("https://stackoverflow.com/questions/78055703/principle-of-reverse-proxy-with-docker-compose");
 
         assertThat(actual.lastUpdate()).isEqualTo(OffsetDateTime.ofInstant(
             Instant.ofEpochSecond(1352102450),
