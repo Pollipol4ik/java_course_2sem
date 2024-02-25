@@ -5,7 +5,6 @@ import edu.java.client.dto.stackoverflow.QuestionResponse;
 import edu.java.client.link_information.LastUpdateTime;
 import edu.java.client.link_information.LinkInformationReceiver;
 import edu.java.link_type_resolver.LinkType;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
