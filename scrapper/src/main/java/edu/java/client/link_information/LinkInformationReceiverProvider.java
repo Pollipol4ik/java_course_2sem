@@ -8,13 +8,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class LinkInformationReceiverProvider {
 
-    private final Map<LinkType, LinkInformationReceiver> receivers = new HashMap<>();
+    private final Map<LinkType, LinkInfoReceiver> receivers = new HashMap<>();
 
-    public void registerReceiver(LinkType linkType, LinkInformationReceiver informationReceiver) {
+    public void registerReceiver(LinkType linkType, LinkInfoReceiver informationReceiver) {
         receivers.put(linkType, informationReceiver);
     }
 
-    public LinkInformationReceiver getReceiver(LinkType linkType) {
+    public LinkInfoReceiver getReceiver(LinkType linkType) {
         return receivers.getOrDefault(linkType, null);
     }
 }

@@ -3,7 +3,7 @@ package edu.java.client.link_information;
 import edu.java.link_type_resolver.LinkType;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public interface LinkInformationReceiver {
+public interface LinkInfoReceiver {
 
     LinkType getLinkType();
 

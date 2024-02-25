@@ -3,7 +3,7 @@ package edu.java.scrapper.client;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import edu.java.client.github.GithubClient;
 import edu.java.client.link_information.LastUpdateTime;
-import edu.java.client.link_information.LinkInformationReceiver;
+import edu.java.client.link_information.LinkInfoReceiver;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -46,9 +46,9 @@ public class GithubClientTest {
     @Test
     @DisplayName("GithubClient#receiveLastUpdateTime test")
     public void receiveLastUpdateTime_shouldReturnCorrectResponse() {
-        LinkInformationReceiver client = new GithubClient(wireMockServer.baseUrl());
+        LinkInfoReceiver client = new GithubClient(wireMockServer.baseUrl());
         LastUpdateTime actual = client.receiveLastUpdateTime("https://github.com/Pollipol4ik/java_course_2sem");
         assertThat(actual).isNotNull();
-        assertThat(actual.lastUpdate().toLocalDate()).isEqualTo(OffsetDateTime.now().toLocalDate());
+        assertThat(actual.lastUpdateTime().toLocalDate()).isEqualTo(OffsetDateTime.now().toLocalDate());
     }
 }

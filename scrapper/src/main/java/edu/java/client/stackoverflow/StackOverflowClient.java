@@ -1,14 +1,14 @@
 package edu.java.client.stackoverflow;
 
-import edu.java.client.AbstractWebClient;
+import edu.java.client.AbstractClient;
 import edu.java.client.dto.stackoverflow.QuestionResponse;
 import edu.java.client.link_information.LastUpdateTime;
-import edu.java.client.link_information.LinkInformationReceiver;
+import edu.java.client.link_information.LinkInfoReceiver;
 import edu.java.link_type_resolver.LinkType;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class StackOverflowClient extends AbstractWebClient implements LinkInformationReceiver {
+public class StackOverflowClient extends AbstractClient implements LinkInfoReceiver {
 
     private static final String STACK_OVERFLOW_API_BASE_URL = "https://api.stackexchange.com/2.3/";
     private static final Pattern STACK_OVERFLOW_QUESTION_LINK_PATTERN =

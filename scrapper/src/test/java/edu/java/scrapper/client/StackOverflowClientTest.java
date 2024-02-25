@@ -2,7 +2,7 @@ package edu.java.scrapper.client;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import edu.java.client.link_information.LastUpdateTime;
-import edu.java.client.link_information.LinkInformationReceiver;
+import edu.java.client.link_information.LinkInfoReceiver;
 import edu.java.client.stackoverflow.StackOverflowClient;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -48,12 +48,12 @@ public class StackOverflowClientTest {
     @Test
     @DisplayName("StackOverflowClient#receiveLastUpdateTime test")
     public void receiveLastUpdateTime_shouldReturnCorrectResponse() {
-        LinkInformationReceiver stackOverflowClient =
+        LinkInfoReceiver stackOverflowClient =
                 new StackOverflowClient(wireMockServer.baseUrl());
 
         LastUpdateTime actual =
                 stackOverflowClient.receiveLastUpdateTime("https://stackoverflow.com/questions/78055703/principle-of-reverse-proxy-with-docker-compose");
 
-        assertThat(actual.lastUpdate()).isNotNull();
+        assertThat(actual.lastUpdateTime()).isNotNull();
     }
 }
