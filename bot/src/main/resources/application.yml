@@ -1,6 +1,10 @@
 app:
-  telegram-token: //your token must be here
+  telegram-token: 6830302236:AAHhIgpBMPwaIyxdGyn9usln77ZBJNBWgDE
 
+
+client:
+  scrapper:
+    base-url:
 
 spring:
   application:

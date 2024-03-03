@@ -1,7 +1,7 @@
 package edu.java.bot.service;
 
 import edu.java.bot.dto.UpdateLink;
-import edu.java.bot.message_sender.Sender;
+import edu.java.bot.message_sender.TelegramMessageSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UpdateService {
 
-    private final Sender sender;
+    private final TelegramMessageSender sender;
 
     public void sendUpdate(UpdateLink linkUpdate) {
 

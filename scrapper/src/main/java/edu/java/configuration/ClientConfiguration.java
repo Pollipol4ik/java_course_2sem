@@ -19,6 +19,7 @@ public class ClientConfiguration {
     public LinkInfoReceiver githubClient() {
         return new GithubClient();
     }
+
     @Bean
     public BotClient botClient() {
 
