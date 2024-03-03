@@ -9,17 +9,19 @@ public abstract class AbstractClient<S> {
 
     protected final S service;
 
-    @SuppressWarnings("unchecked")
     public AbstractClient(String baseUrl) {
-        var factory = HttpServiceProxyFactory.builderFor(
-            WebClientAdapter.create(
-                WebClient.builder()
-                    .baseUrl(baseUrl)
-                    .build()
-            )
-        ).build();
-        var serviceClass = (Class<S>) ((ParameterizedType) getClass().getGenericSuperclass())
-            .getActualTypeArguments()[0];
-        service = factory.createClient(serviceClass);
+        WebClient webClient = WebClient.builder()
+            .baseUrl(baseUrl)
+            .build();
+        WebClientAdapter webClientAdapter = WebClientAdapter.create(webClient);
+        HttpServiceProxyFactory httpServiceProxyFactory = HttpServiceProxyFactory.builderFor(webClientAdapter).build();
+        Class<S> serviceClass = getServiceClass();
+        service = httpServiceProxyFactory.createClient(serviceClass);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Class<S> getServiceClass() {
+        ParameterizedType parameterizedType = (ParameterizedType) getClass().getGenericSuperclass();
+        return (Class<S>) parameterizedType.getActualTypeArguments()[0];
     }
 }

@@ -10,11 +10,11 @@ import java.util.regex.Pattern;
 
 public class GithubClient extends AbstractClient<GithubService> implements LinkInfoReceiver {
 
-    private static final String BASE_URL = "https://api.github.com/";
+    private static final String DEFAULT_BASE_URL = "https://api.github.com/";
     private static final Pattern REPOSITORY_PATTERN = Pattern.compile("https://github.com/(.+)/(.+)");
 
     public GithubClient() {
-        this(BASE_URL);
+        this(DEFAULT_BASE_URL);
     }
 
     public GithubClient(String baseUrl) {
@@ -32,7 +32,9 @@ public class GithubClient extends AbstractClient<GithubService> implements LinkI
         if (!matcher.find()) {
             return null;
         }
-        RepositoryResponse response = service.getRepository(matcher.group(1), matcher.group(2));
+        String owner = matcher.group(1);
+        String repositoryName = matcher.group(2);
+        RepositoryResponse response = service.getRepository(owner, repositoryName);
         return new LastUpdateTime(response.lastUpdate());
     }
 }

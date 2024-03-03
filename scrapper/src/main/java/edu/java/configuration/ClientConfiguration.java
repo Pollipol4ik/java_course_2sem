@@ -22,7 +22,6 @@ public class ClientConfiguration {
 
     @Bean
     public BotClient botClient() {
-
         return new BotClient();
     }
 }

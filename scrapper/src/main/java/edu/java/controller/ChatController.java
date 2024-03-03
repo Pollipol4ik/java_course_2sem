@@ -10,22 +10,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/tg-chat")
+@RequestMapping("/telegram/chat")
 @RequiredArgsConstructor
 @Log4j2
 public class ChatController {
 
     private final ChatService chatService;
 
-    @PostMapping("/{id}")
-    public void registerChat(@PathVariable("id") long chatId) {
-        log.info("Registering chat with id {}", chatId);
+    @PostMapping("/{chatId}")
+    public void registerChat(@PathVariable("chatId") Long chatId) {
+        log.info("Registering chat with ID: {}", chatId);
         chatService.registerChat(chatId);
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteChat(@PathVariable("id") long chatId) {
-        log.info("Deleting chat with id {}", chatId);
+    @DeleteMapping("/{chatId}")
+    public void deleteChat(@PathVariable("chatId") Long chatId) {
+        log.info("Deleting chat with ID: {}", chatId);
         chatService.deleteChat(chatId);
     }
 }

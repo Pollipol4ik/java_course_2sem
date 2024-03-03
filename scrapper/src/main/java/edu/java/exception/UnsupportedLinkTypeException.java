@@ -5,6 +5,6 @@ import edu.java.dto.AddLinkRequest;
 public class UnsupportedLinkTypeException extends RuntimeException {
 
     public UnsupportedLinkTypeException(AddLinkRequest addLinkRequest) {
-        super("Тип ссылки %s не поддерживается".formatted(addLinkRequest.link()));
+        super(String.format("The link type %s is not supported", addLinkRequest.link()));
     }
 }

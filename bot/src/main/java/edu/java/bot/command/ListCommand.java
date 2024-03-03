@@ -22,7 +22,7 @@ public class ListCommand implements CommandExecutor {
 
     @Override
     public SendMessage execute(String command, long chatId) {
-        log.info("Command /list has executed");
+        log.info("Command /list has been executed");
         return buildMessage(chatId);
     }
 
@@ -40,6 +40,4 @@ public class ListCommand implements CommandExecutor {
         Keyboard keyboard = KeyboardBuilder.buildUrlKeyboard(links);
         return new SendMessage(chatId, TRACKED_LINKS).replyMarkup(keyboard);
     }
-
 }
-

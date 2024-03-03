@@ -6,8 +6,10 @@ import edu.java.bot.client.ScrapperClient;
 import edu.java.bot.dto.RemoveLinkRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.stereotype.Component;
 import static edu.java.bot.util.MessagesUtils.LINK_HAS_BEEN_UNTRACKED;
 
+@Component
 @RequiredArgsConstructor
 @Log4j2
 public class UpdateCallbackResolver extends UpdateResolver {
@@ -26,8 +28,9 @@ public class UpdateCallbackResolver extends UpdateResolver {
 
     private void processCallback(long chatId, String data) {
         if (!data.startsWith("/untrack:")) {
-            throw new RuntimeException("Invalid callback");
+            throw new IllegalArgumentException("Invalid callback");
         }
-        scrapperClient.untrackLink(chatId, new RemoveLinkRequest(Long.parseLong(data.split(":")[1])));
+        long linkId = Long.parseLong(data.split(":")[1]);
+        scrapperClient.untrackLink(chatId, new RemoveLinkRequest(linkId));
     }
 }

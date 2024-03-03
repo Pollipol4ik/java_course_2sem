@@ -5,6 +5,6 @@ import edu.java.dto.RemoveLinkRequest;
 public class LinkNotFoundException extends RuntimeException {
 
     public LinkNotFoundException(RemoveLinkRequest removeLinkRequest) {
-        super("Ссылка id = %s не найдена".formatted(removeLinkRequest.linkId()));
+        super(String.format("Link id = %s not found", removeLinkRequest.linkId()));
     }
 }

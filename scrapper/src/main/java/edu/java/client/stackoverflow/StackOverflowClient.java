@@ -10,12 +10,12 @@ import java.util.regex.Pattern;
 
 public class StackOverflowClient extends AbstractClient<StackOverflowService> implements LinkInfoReceiver {
 
-    private static final String BASE_URL = "https://api.stackexchange.com/2.3/";
+    private static final String DEFAULT_BASE_URL = "https://api.stackexchange.com/2.3/";
     private static final Pattern STACKOVERFLOW_LINK_PATTERN =
         Pattern.compile("https://stackoverflow.com/questions/(\\d+).*");
 
     public StackOverflowClient() {
-        this(BASE_URL);
+        this(DEFAULT_BASE_URL);
     }
 
     public StackOverflowClient(String baseUrl) {
@@ -33,7 +33,8 @@ public class StackOverflowClient extends AbstractClient<StackOverflowService> im
         if (!matcher.find()) {
             return null;
         }
-        QuestionResponse response = service.getQuestion(matcher.group(1));
+        String questionId = matcher.group(1);
+        QuestionResponse response = service.getQuestion(questionId);
         return new LastUpdateTime(response.items().get(0).lastUpdate());
     }
 }

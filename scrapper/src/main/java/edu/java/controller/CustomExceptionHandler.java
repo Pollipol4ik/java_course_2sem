@@ -19,83 +19,50 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 @RestControllerAdvice
 public class CustomExceptionHandler {
 
-    @SuppressWarnings("checkstyle:MultipleStringLiterals")
     @ExceptionHandler(ChatAlreadyRegisteredException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ApiErrorResponse chatAlreadyRegisteredException(ChatAlreadyRegisteredException e) {
-        return new ApiErrorResponse(
-            "Чат уже зарегистрирован",
-            "409",
-            "Chat already registered",
-            e.getMessage(),
-            Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString)
-                .collect(Collectors.toList())
-        );
+    public ApiErrorResponse handleChatAlreadyRegisteredException(ChatAlreadyRegisteredException e) {
+        return createErrorResponse("Chat already registered", HttpStatus.CONFLICT, e);
     }
 
-    @SuppressWarnings("checkstyle:MultipleStringLiterals")
     @ExceptionHandler(ChatNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiErrorResponse chatNotFoundException(ChatNotFoundException e) {
-        return new ApiErrorResponse(
-            "Чат не найден",
-            "404",
-            "Chat not found",
-            e.getMessage(),
-            Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString)
-                .collect(Collectors.toList())
-        );
+    public ApiErrorResponse handleChatNotFoundException(ChatNotFoundException e) {
+        return createErrorResponse("Chat not found", HttpStatus.NOT_FOUND, e);
     }
 
     @ExceptionHandler(LinkNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiErrorResponse linkNotFoundException(LinkNotFoundException e) {
-        return new ApiErrorResponse(
-            "Ссылка не найдена",
-            "404",
-            "Link not found",
-            e.getMessage(),
-            Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString)
-                .collect(Collectors.toList())
-        );
+    public ApiErrorResponse handleLinkNotFoundException(LinkNotFoundException e) {
+        return createErrorResponse("Link not found", HttpStatus.NOT_FOUND, e);
     }
 
     @ExceptionHandler(UnsupportedLinkTypeException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-    public ApiErrorResponse unsupportedLinkException(UnsupportedLinkTypeException e) {
-        return new ApiErrorResponse(
-            "Ссылка не поддерживается",
-            "422",
-            "Unsupported link",
-            e.getMessage(),
-            Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString)
-                .collect(Collectors.toList())
-        );
+    public ApiErrorResponse handleUnsupportedLinkException(UnsupportedLinkTypeException e) {
+        return createErrorResponse("Unsupported link", HttpStatus.UNPROCESSABLE_ENTITY, e);
     }
 
     @ExceptionHandler(LinkAlreadyTrackedException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ApiErrorResponse linkAlreadyTrackedException(LinkAlreadyTrackedException e) {
-        return new ApiErrorResponse(
-            "Ссылка уже отслеживается",
-            "409",
-            "Link is already tracked",
-            e.getMessage(),
-            Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString)
-                .collect(Collectors.toList())
-        );
+    public ApiErrorResponse handleLinkAlreadyTrackedException(LinkAlreadyTrackedException e) {
+        return createErrorResponse("Link is already tracked", HttpStatus.CONFLICT, e);
     }
 
     @ExceptionHandler({MissingRequestHeaderException.class, HttpMessageNotReadableException.class,
         MethodArgumentTypeMismatchException.class})
-    public ApiErrorResponse invalidRequest(RuntimeException e) {
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiErrorResponse handleInvalidRequest(RuntimeException e) {
+        return createErrorResponse("Invalid Request", HttpStatus.BAD_REQUEST, e);
+    }
+
+    private ApiErrorResponse createErrorResponse(String message, HttpStatus httpStatus, RuntimeException e) {
         return new ApiErrorResponse(
-            "Некорректный запрос",
-            "400",
-            "Invalid Request",
+            message,
+            String.valueOf(httpStatus.value()),
+            httpStatus.getReasonPhrase(),
             e.getMessage(),
-            Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString)
-                .collect(Collectors.toList())
+            Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).collect(Collectors.toList())
         );
     }
 }

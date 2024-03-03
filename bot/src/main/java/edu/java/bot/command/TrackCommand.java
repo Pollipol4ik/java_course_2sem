@@ -22,7 +22,7 @@ public class TrackCommand implements CommandExecutor {
 
     @Override
     public SendMessage execute(String command, long chatId) {
-        log.info("Command /track has executed");
+        log.info("Command /track has been executed");
         return buildMessage(command, chatId);
     }
 

@@ -23,7 +23,7 @@ public class UntrackCommand implements CommandExecutor {
 
     @Override
     public SendMessage execute(String command, long chatId) {
-        log.info("Command /untrack has executed");
+        log.info("Command /untrack has been executed");
         return buildMessage(chatId);
     }
 

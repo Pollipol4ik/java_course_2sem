@@ -3,6 +3,6 @@ package edu.java.exception;
 public class ChatNotFoundException extends RuntimeException {
 
     public ChatNotFoundException(long chatId) {
-        super("Чат id = %d не найден".formatted(chatId));
+        super(String.format("Chat id = %d not found", chatId));
     }
 }
