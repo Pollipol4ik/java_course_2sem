@@ -1,4 +1,4 @@
-package edu.java.client;
+package edu.java.bot.client;
 
 import java.lang.reflect.ParameterizedType;
 import org.springframework.web.reactive.function.client.WebClient;
