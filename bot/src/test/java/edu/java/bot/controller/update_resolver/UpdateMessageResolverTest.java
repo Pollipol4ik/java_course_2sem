@@ -1,9 +1,9 @@
-package edu.java.bot.resolver;
-
+package edu.java.bot.controller.update_resolver;
 
 import com.google.gson.Gson;
 import com.pengrad.telegrambot.model.Update;
 import edu.java.bot.command.CommandChain;
+import edu.java.bot.resolver.UpdateMessageResolver;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

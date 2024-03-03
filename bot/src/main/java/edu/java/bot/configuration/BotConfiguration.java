@@ -1,17 +1,12 @@
 package edu.java.bot.configuration;
 
+import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.BotCommand;
+import edu.java.bot.client.ScrapperClient;
 import edu.java.bot.command.CommandChain;
-import edu.java.bot.command.CommandExecutor;
-import edu.java.bot.command.HelpCommand;
-import edu.java.bot.command.ListCommand;
-import edu.java.bot.command.StartCommand;
-import edu.java.bot.command.TrackCommand;
-import edu.java.bot.command.UntrackCommand;
 import edu.java.bot.resolver.UpdateCallbackResolver;
 import edu.java.bot.resolver.UpdateMessageResolver;
 import edu.java.bot.resolver.UpdateResolver;
-import edu.java.bot.service.CommandService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import static edu.java.bot.command.Command.HELP;
@@ -23,28 +18,11 @@ import static edu.java.bot.command.Command.UNTRACK;
 public class BotConfiguration {
 
     @Bean
-    public CommandService linkService() {
-        return new CommandService();
-    }
-
-    @Bean
-    public UpdateResolver updateResolver() {
+    public UpdateResolver updateResolver(ScrapperClient scrapperClient, CommandChain commandChain) {
         return UpdateResolver.link(
-            new UpdateMessageResolver(commandChain()),
-            new UpdateCallbackResolver(linkService())
+            new UpdateMessageResolver(commandChain),
+            new UpdateCallbackResolver(scrapperClient)
         );
-    }
-
-    @Bean
-    public CommandChain commandChain() {
-        return new CommandChain(
-            CommandExecutor.link(
-                new StartCommand(),
-                new HelpCommand(),
-                new ListCommand(linkService()),
-                new TrackCommand(linkService()),
-                new UntrackCommand(linkService())
-            ));
     }
 
     @Bean
@@ -58,7 +36,7 @@ public class BotConfiguration {
     }
 
     @Bean
-    public String telegramToken(ApplicationConfig applicationConfig) {
-        return applicationConfig.telegramToken();
+    public TelegramBot bot(ApplicationConfig applicationConfig) {
+        return new TelegramBot(applicationConfig.telegramToken());
     }
 }

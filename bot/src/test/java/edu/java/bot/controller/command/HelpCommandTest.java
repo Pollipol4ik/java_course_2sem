@@ -1,8 +1,7 @@
-package edu.java.bot.command;
-
-
+package edu.java.bot.controller.command;
 
 import com.pengrad.telegrambot.request.SendMessage;
+import edu.java.bot.command.HelpCommand;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

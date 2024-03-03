@@ -1,32 +1,17 @@
 package edu.java.bot.command;
 
-import com.pengrad.telegrambot.model.request.ParseMode;
+
 import com.pengrad.telegrambot.request.SendMessage;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-import static edu.java.bot.util.MessagesUtils.ERROR_MESSAGE;
+import org.springframework.beans.factory.annotation.Autowired;
 
-@RequiredArgsConstructor
-@Component
-public abstract class CommandExecutor {
+public interface CommandExecutor {
 
-    private CommandExecutor next;
+    SendMessage execute(String command, long chatId);
 
-    public static CommandExecutor link(CommandExecutor first, CommandExecutor... chain) {
-        CommandExecutor head = first;
-        for (CommandExecutor nextInChain : chain) {
-            head.next = nextInChain;
-            head = nextInChain;
-        }
-        return first;
-    }
+    String getCommandName();
 
-    protected abstract SendMessage execute(String command, long chatId);
-
-    protected SendMessage executeNext(String command, long chatId) {
-        if (next == null) {
-            return new SendMessage(chatId, ERROR_MESSAGE).parseMode(ParseMode.HTML);
-        }
-        return next.execute(command, chatId);
+    @Autowired
+    default void registerMyself(CommandChain commandChain) {
+        commandChain.registerCommand(getCommandName(), this);
     }
 }

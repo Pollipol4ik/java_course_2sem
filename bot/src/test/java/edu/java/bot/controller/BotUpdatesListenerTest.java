@@ -1,9 +1,9 @@
-package edu.java.bot;
-
+package edu.java.bot.controller;
 
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
-import edu.java.bot.message_sender.Sender;
+import edu.java.bot.BotUpdatesListener;
+import edu.java.bot.message_sender.TelegramMessageSender;
 import edu.java.bot.resolver.UpdateResolver;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -20,7 +20,7 @@ public class BotUpdatesListenerTest {
     @Mock
     private UpdateResolver updateResolver;
     @Mock
-    private Sender messageSender;
+    private TelegramMessageSender messageSender;
     @InjectMocks
     private BotUpdatesListener listener;
 
