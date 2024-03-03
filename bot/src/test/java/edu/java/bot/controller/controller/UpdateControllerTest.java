@@ -1,6 +1,7 @@
-package edu.java.bot.controller;
+package edu.java.bot.controller.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.java.bot.controller.UpdateController;
 import edu.java.bot.dto.UpdateLink;
 import edu.java.bot.service.UpdateService;
 import java.util.List;
@@ -27,7 +28,7 @@ public class UpdateControllerTest {
     @Test
     @SneakyThrows
     public void sendUpdate_shouldReturn200_whenAllIsOk() {
-        UpdateLink linkUpdate = new UpdateLink(1, "1", "1", List.of(1L));
+        UpdateLink linkUpdate = new UpdateLink(2, "1", "all", List.of(1L));
         Mockito.doNothing().when(updateService).sendUpdate(linkUpdate);
 
         mvc.perform(post("/updates")
