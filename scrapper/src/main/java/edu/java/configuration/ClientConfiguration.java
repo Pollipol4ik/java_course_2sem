@@ -1,5 +1,6 @@
 package edu.java.configuration;
 
+import edu.java.client.BotClient;
 import edu.java.client.github.GithubClient;
 import edu.java.client.link_information.LinkInfoReceiver;
 import edu.java.client.stackoverflow.StackOverflowClient;
@@ -17,5 +18,10 @@ public class ClientConfiguration {
     @Bean
     public LinkInfoReceiver githubClient() {
         return new GithubClient();
+    }
+    @Bean
+    public BotClient botClient() {
+
+        return new BotClient();
     }
 }

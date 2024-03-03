@@ -7,7 +7,7 @@ import edu.java.link_type_resolver.LinkType;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class GithubClient extends AbstractClient {
+public class GithubClient extends AbstractClient<B> {
 
     private static final String GITHUB_API_BASE_URL = "https://api.github.com/";
     private static final Pattern GITHUB_REPOSITORY_PATTERN = Pattern.compile("https://github.com/(.+)/(.+)");

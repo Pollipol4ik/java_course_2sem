@@ -11,6 +11,9 @@
 
     <artifactId>scrapper</artifactId>
     <version>${revision}</version>
+    <properties>
+        <spring.doc.version>2.1.0</spring.doc.version>
+    </properties>
 
     <dependencies>
         <!-- Web -->
@@ -35,6 +38,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${spring.doc.version}</version>
         </dependency>
 
         <!-- Kafka -->

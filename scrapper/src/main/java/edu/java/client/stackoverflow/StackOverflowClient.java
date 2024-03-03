@@ -8,7 +8,7 @@ import edu.java.link_type_resolver.LinkType;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class StackOverflowClient extends AbstractClient implements LinkInfoReceiver {
+public class StackOverflowClient extends AbstractClient<B> implements LinkInfoReceiver {
 
     private static final String STACK_OVERFLOW_API_BASE_URL = "https://api.stackexchange.com/2.3/";
     private static final Pattern STACK_OVERFLOW_QUESTION_LINK_PATTERN =
