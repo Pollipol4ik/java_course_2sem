@@ -20,7 +20,7 @@ public class InitMigrationsTest extends IntegrationEnvironment {
     private final static List<String> ASSOCIATION_COLUMNS = List.of("chat_id", "link_id");
 
     @Test
-    @DisplayName("Проверка создания таблицы Link")
+    @DisplayName("Проверка создания таблицы link")
     @SneakyThrows
     public void tableLinkCreateTest() {
         List<String> actualColumns = getTableColumns("link");
@@ -28,7 +28,7 @@ public class InitMigrationsTest extends IntegrationEnvironment {
     }
 
     @Test
-    @DisplayName("Проверка создания таблицы Chat")
+    @DisplayName("Проверка создания таблицы chat")
     @SneakyThrows
     public void tableChatCreateTest() {
         List<String> actualColumns = getTableColumns("chat");
@@ -36,7 +36,7 @@ public class InitMigrationsTest extends IntegrationEnvironment {
     }
 
     @Test
-    @DisplayName("Проверка создания таблицы chat_link_association")
+    @DisplayName("Проверка создания таблицы chat_link_")
     @SneakyThrows
     public void tableAssociationCreateTest() {
         List<String> actualColumns = getTableColumns("chat_link");
