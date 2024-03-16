@@ -8,6 +8,8 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.net.URI;
 import java.time.OffsetDateTime;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
@@ -52,7 +54,7 @@ public class StackOverflowClientTest {
                 new StackOverflowClient(wireMockServer.baseUrl());
 
         LastUpdateTime actual =
-                stackOverflowClient.receiveLastUpdateTime("https://stackoverflow.com/questions/78055703/principle-of-reverse-proxy-with-docker-compose");
+                stackOverflowClient.receiveLastUpdateTime(URI.create("https://stackoverflow.com/questions/78055703/principle-of-reverse-proxy-with-docker-compose"));
 
         assertThat(actual.lastUpdateTime()).isNotNull();
     }

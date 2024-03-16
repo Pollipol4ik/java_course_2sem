@@ -1,16 +1,24 @@
 package edu.java.client;
 
-import edu.java.service.BotService;
+import edu.java.dto.UpdateLink;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
 
-public class BotClient extends AbstractClient<BotService> {
+@Component
+@RequiredArgsConstructor
+public class BotClient {
+    private final WebClient webClient;
 
-    private static final String BOT_BASE_URL = "http://localhost:8090/";
-
-    public BotClient() {
-        this(BOT_BASE_URL);
-    }
-
-    public BotClient(String baseUrl) {
-        super(baseUrl);
+    public void sendUpdate(UpdateLink linkUpdate) {
+        webClient
+            .post()
+            .uri("/updates")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(linkUpdate)
+            .retrieve()
+            .bodyToMono(Void.class)
+            .block();
     }
 }

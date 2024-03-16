@@ -3,7 +3,7 @@ package edu.java.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.java.exception.ChatAlreadyRegisteredException;
 import edu.java.exception.ChatNotFoundException;
-import edu.java.service.ChatService;
+import edu.java.service.chat.ChatService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

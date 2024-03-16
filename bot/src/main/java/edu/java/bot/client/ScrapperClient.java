@@ -5,6 +5,7 @@ import edu.java.bot.dto.ListLinksResponse;
 import edu.java.bot.dto.RemoveLinkRequest;
 import edu.java.bot.dto.ResponseLink;
 import edu.java.bot.service.ScrapperService;
+import reactor.core.publisher.Mono;
 
 public class ScrapperClient extends AbstractClient<ScrapperService> {
 
@@ -36,5 +37,13 @@ public class ScrapperClient extends AbstractClient<ScrapperService> {
 
     public void deleteChat(long chatId) {
         service.deleteChat(chatId);
+    }
+    private Mono<? extends Throwable> handleError(ClientResponse clientResponse) {
+        return clientResponse.bodyToMono(ApiErrorResponse.class)
+            .flatMap(apiErrorResponse -> Mono.error(new ScrapperException(
+                apiErrorResponse.description(),
+                HttpStatus.valueOf(Integer.parseInt(apiErrorResponse.code())),
+                apiErrorResponse.exceptionMessage()
+            )));
     }
 }

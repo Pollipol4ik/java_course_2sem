@@ -8,6 +8,8 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.net.URI;
 import java.time.OffsetDateTime;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
@@ -47,7 +49,7 @@ public class GithubClientTest {
     @DisplayName("GithubClient#receiveLastUpdateTime test")
     public void receiveLastUpdateTime_shouldReturnCorrectResponse() {
         LinkInfoReceiver client = new GithubClient(wireMockServer.baseUrl());
-        LastUpdateTime actual = client.receiveLastUpdateTime("https://github.com/Pollipol4ik/java_course_2sem");
+        LastUpdateTime actual = client.receiveLastUpdateTime(URI.create("https://github.com/Pollipol4ik/java_course_2sem"));
         assertThat(actual).isNotNull();
         assertThat(actual.lastUpdateTime().toLocalDate()).isEqualTo(OffsetDateTime.now().toLocalDate());
     }
