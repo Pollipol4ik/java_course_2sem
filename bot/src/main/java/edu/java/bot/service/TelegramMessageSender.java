@@ -1,4 +1,4 @@
-package edu.java.bot.message_sender;
+package edu.java.bot.service;
 
 
 import com.pengrad.telegrambot.TelegramBot;

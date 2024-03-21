@@ -11,18 +11,18 @@ public class JdbcChatRepository implements ChatRepository {
 
     @Override
     public void add(Long chatId) {
-        jdbcTemplate.update("INSERT INTO chat (chat_id) VALUES (?)", chatId);
+        jdbcTemplate.update("INSERT INTO chat (id) VALUES (?)", chatId);
     }
 
     @Override
     public void remove(Long chatId) {
-        jdbcTemplate.update("DELETE FROM chat WHERE chat_id = (?)", chatId);
+        jdbcTemplate.update("DELETE FROM chat WHERE id = (?)", chatId);
     }
 
     @Override
     public boolean isInTable(Long chatId) {
         return Boolean.TRUE.equals(jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM chat WHERE chat_id = ?",
+            "SELECT COUNT(*) FROM chat WHERE id = ?",
             Boolean.class,
             chatId
         ));

@@ -37,6 +37,6 @@ public class BotConfiguration {
 
     @Bean
     public TelegramBot bot(ApplicationConfig applicationConfig) {
-        return new TelegramBot(applicationConfig.telegramToken());
+        return new TelegramBot(applicationConfig.getToken());
     }
 }

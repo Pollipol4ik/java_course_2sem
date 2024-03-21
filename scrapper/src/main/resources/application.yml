@@ -4,16 +4,32 @@ app:
     interval: 10000
     force-check-delay: 10000
 
+client:
+  stackoverflow:
+    base-url: https://api.stackexchange.com/2.3/
+  github:
+    authorization-token: #YOUR TOKEN
+    base-url: https://api.github.com/
+  bot:
+    base-url: http://localhost:8090/
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui
+
 spring:
   application:
     name: scrapper
+  liquibase:
+    enabled: false
+  datasource:
+    url: jdbc:postgresql://localhost:15432/scrapper
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
 
 server:
   port: 8080
 
 logging:
   config: classpath:log4j2-plain.xml
-
-springdoc:
-  swagger-ui:
-    path: /swagger-ui

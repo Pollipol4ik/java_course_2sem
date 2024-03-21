@@ -1,18 +1,15 @@
 package edu.java.repository.chat_link;
 
-import edu.java.dto.ChatLinkResponse;
-import edu.java.dto.ResponseLink;
-import java.time.OffsetDateTime;
+import edu.java.dto.Chat;
 import java.util.List;
 
 public interface ChatLinkRepository {
-    List<ChatLinkResponse> findAllFiltered(OffsetDateTime time);
 
-    void add(Long chatId, Long linkId);
+    void add(long linkId, long chatId);
 
-    ResponseLink remove(Long chatId, Long linkId);
+    void remove(long linkId, long chatId);
 
-    boolean isTracked(Long chatId, Long linkId);
+    void removeByLinkId(long linkId);
 
-    boolean hasChats(Long linkId);
+    List<Chat> findAllByLinkId(long linkId);
 }

@@ -1,78 +1,106 @@
 package edu.java.repository.link;
 
-
-import edu.java.client.link_information.LastUpdateTime;
 import edu.java.dto.AddLinkRequest;
 import edu.java.dto.LinkData;
 import edu.java.dto.ListLinksResponse;
-import edu.java.dto.RemoveLinkRequest;
 import edu.java.dto.ResponseLink;
-import edu.java.repository.link.mapper.LinkDataMapper;
-import edu.java.repository.link.mapper.LinkResponseMapper;
+import edu.java.link_type_resolver.LinkType;
+import java.time.Duration;
+import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-@Log4j2
 public class JdbcLinkRepository implements LinkRepository {
-    private final LinkResponseMapper mapper = new LinkResponseMapper();
-    private final LinkDataMapper dataMapper = new LinkDataMapper();
 
-    private final JdbcTemplate jdbcTemplate;
+    private final JdbcClient jdbcClient;
+
 
     @Override
-    public ListLinksResponse findAll(Long chatId) {
-        List<ResponseLink> linksList =
-            jdbcTemplate.query(
-                "SELECT link.* FROM link "
-                    + "JOIN chat_link ON link.id = chat_link.link_id WHERE chat_link.chat_id = ?",
-                mapper,
-                chatId
-            );
-        return new ListLinksResponse(linksList);
+    public ListLinksResponse findAll(long chatId) {
+        return new ListLinksResponse(jdbcClient.sql("""
+                SELECT id, url AS link FROM link""")
+            .query(ResponseLink.class)
+            .list());
+    }
+
+    @SuppressWarnings("checkstyle:MultipleStringLiterals")
+    @Override
+    public long add(long chatId, AddLinkRequest addLinkRequest, LinkType linkType) {
+        return jdbcClient.sql("""
+                INSERT INTO link(url, type, updated_at, last_checked_at)
+                VALUES (:url, :link_type, :updated_at, :last_checked_at)
+                ON CONFLICT (url) DO UPDATE SET updated_at = :updated_at, last_checked_at = :last_checked_at
+                RETURNING id""")
+            .param("url", addLinkRequest.link())
+            .param("link_type", linkType.name())
+            .param("updated_at", null)
+            .param("last_checked_at", OffsetDateTime.now())
+            .query(Long.class)
+            .single();
     }
 
     @Override
-    public ResponseLink add(Long chatId, AddLinkRequest addLinkRequest) {
-        Long linkId = jdbcTemplate.queryForObject(
-            "INSERT INTO link (url) VALUES (?) RETURNING id",
-            Long.class,
-            addLinkRequest.link().toString()
-        );
-        return new ResponseLink(linkId, addLinkRequest.link());
+    public ListLinksResponse findAllByChatId(long chatId) {
+        return new ListLinksResponse(jdbcClient.sql("""
+                SELECT link_id, link.url AS link FROM link
+                JOIN chat_link ON link.id = chat_link.link_id
+                WHERE chat_id = :chatId""")
+            .param("chatId", chatId)
+            .query(ResponseLink.class)
+            .list());
+    }
+
+    @SuppressWarnings("checkstyle:MultipleStringLiterals")
+    @Override
+    public void remove(long linkId) {
+        jdbcClient.sql("""
+                DELETE FROM link
+                WHERE id = :link_id""")
+            .param("link_id", linkId)
+            .update();
     }
 
     @Override
-    public ResponseLink remove(Long chatId, RemoveLinkRequest removeLinkRequest) {
-        long id = removeLinkRequest.linkId();
-        ResponseLink linkResponse = jdbcTemplate.queryForObject("SELECT * FROM link WHERE link_id = (?)", mapper, id);
-        jdbcTemplate.update("DELETE FROM link WHERE id = (?)", id);
-        return linkResponse;
-    }
-
-
-    @Override
-    public LinkData getData(Long linkId) {
-        return jdbcTemplate.queryForObject("SELECT last_update_time, url FROM link"
-            + " WHERE link_id = (?)", dataMapper, linkId);
+    public Optional<LinkData> findByUrl(String url) {
+        return Optional.of(jdbcClient.sql(
+                "SELECT id, url, type, updated_at, last_checked_at FROM link WHERE url = :url")
+            .param("url", url)
+            .query(LinkData.class)
+            .single());
     }
 
     @Override
-    public void updateLink(LastUpdateTime info) {
-
+    public Optional<LinkData> findById(long linkId) {
+        return Optional.of(jdbcClient.sql(
+                "SELECT id, url, type, updated_at, last_checked_at FROM link WHERE id = :id")
+            .param("id", linkId)
+            .query(LinkData.class)
+            .single());
     }
 
     @Override
-    public Long getLinkId(String url) {
-        Boolean isInTable =
-            jdbcTemplate.queryForObject("SELECT COUNT(id) FROM link WHERE url = (?)", Boolean.class, url);
-        if (Boolean.TRUE.equals(isInTable)) {
-            return jdbcTemplate.queryForObject("SELECT id FROM link WHERE url = (?)", Long.class, url);
-        }
-        return 0L;
+    public List<LinkData> findUncheckedLinks(Duration checkPeriod) {
+        return jdbcClient.sql("""
+                SELECT id, url, type, updated_at, last_checked_at FROM link
+                WHERE last_checked_at < :last_checked_at""")
+            .param("last_checked_at", OffsetDateTime.now().minus(checkPeriod))
+            .query(LinkData.class)
+            .list();
+    }
+
+    @Override
+    public void updateInfo(long linkId, OffsetDateTime updatedAt) {
+        jdbcClient.sql("""
+                UPDATE link SET last_checked_at = :last_checked_at, updated_at = :updated_at
+                WHERE id = :link_id""")
+            .param("last_checked_at", OffsetDateTime.now())
+            .param("updated_at", updatedAt)
+            .param("link_id", linkId)
+            .update();
     }
 }

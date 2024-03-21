@@ -19,6 +19,8 @@ public class JdbcChatService implements ChatService {
         if(chatRepository.isInTable(chatId)){
             throw new ChatAlreadyRegisteredException(chatId);
         }
+        chatRepository.add(chatId);
+
     }
 
     @Override

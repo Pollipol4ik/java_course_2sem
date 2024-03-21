@@ -19,7 +19,11 @@ public class StartCommand implements CommandExecutor {
     @Override
     public SendMessage execute(String command, long chatId) {
         log.info("Command /start has executed");
-        scrapperClient.registerChat(chatId);
+        try {
+            scrapperClient.registerChat(chatId);
+        } catch (Exception e) {
+            //TODO
+        }
         return new SendMessage(chatId, WELCOME_MESSAGE).parseMode(ParseMode.HTML);
     }
 

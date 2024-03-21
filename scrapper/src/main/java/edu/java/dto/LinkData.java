@@ -1,7 +1,10 @@
 package edu.java.dto;
 
-import java.net.URI;
+import edu.java.link_type_resolver.LinkType;
 import java.time.OffsetDateTime;
+import lombok.Builder;
 
-public record LinkData(OffsetDateTime updateTime, URI url) {
+@Builder
+public record LinkData(long id, String url, LinkType type, OffsetDateTime updatedAt, OffsetDateTime lastCheckedAt) {
+
 }

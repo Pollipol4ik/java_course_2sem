@@ -3,59 +3,61 @@ package edu.java.scheduler;
 import edu.java.client.BotClient;
 import edu.java.client.link_information.LastUpdateTime;
 import edu.java.client.link_information.LinkInfoReceiver;
-import edu.java.dto.ChatLinkResponse;
+import edu.java.client.link_information.LinkInformationReceiverProvider;
+import edu.java.dto.Chat;
 import edu.java.dto.LinkData;
 import edu.java.dto.UpdateLink;
 import edu.java.repository.chat_link.ChatLinkRepository;
 import edu.java.repository.link.LinkRepository;
 import java.net.URI;
-import java.time.OffsetDateTime;
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Log4j2
-@Component
 @RequiredArgsConstructor
 public class LinkUpdaterScheduler {
-    @Value("${spring.database.check-time-minutes}")
-    private int minutesCheckTime;
-    private final List<LinkInfoReceiver> clientInfoProviders;
-    private final BotClient botClient;
+
+    private static final Duration CHECK_PERIOD = Duration.ofSeconds(15);
     private final LinkRepository linkRepository;
     private final ChatLinkRepository chatLinkRepository;
+    private final LinkInformationReceiverProvider linkInformationReceiverManager;
+    private final BotClient botClient;
 
-    @Scheduled(fixedDelayString = "#{@'app-edu.java.configuration.ApplicationConfig'.scheduler.interval}")
-    @Transactional
+    @Scheduled(fixedDelayString = "${app.scheduler.interval}")
     public void update() {
-        OffsetDateTime time = OffsetDateTime.now();
-        time = time.minusMinutes(minutesCheckTime);
-        List<ChatLinkResponse> linksToChats = chatLinkRepository.findAllFiltered(time);
-        log.info(linksToChats);
-        for (ChatLinkResponse linkToChats : linksToChats) {
-            Long linkId = linkToChats.linkId();
-            LinkData data = linkRepository.getData(linkId);
-            UpdateLink update = new UpdateLink(
-                linkId,
-                data.url(),
-                "Ссылка была обновлена: ",
-                linkToChats.tgChatIds().stream().toList()
-            );
-            for (LinkInfoReceiver client : clientInfoProviders) {
-                if (client.isValidate(data.url())) {
-                    LastUpdateTime info = client.receiveLastUpdateTime(data.url());
-                    if (info.lastUpdateTime().isAfter(data.updateTime())) {
-                        log.info("here");
-                        linkRepository.updateLink(info);
-                        botClient.sendUpdate(update);
-                    }
-                }
+
+        log.info("Update has been started");
+        List<LinkData> links = linkRepository.findUncheckedLinks(CHECK_PERIOD);
+
+        log.info("Updating {}", links);
+        List<UpdateLink> linkUpdates = new ArrayList<>();
+        for (LinkData link : links) {
+            LinkInfoReceiver linkInformationProvider =
+                linkInformationReceiverManager.getReceiver(link.type());
+            LastUpdateTime lastUpdateTime = linkInformationProvider.receiveLastUpdateTime(URI.create(link.url()));
+            if (!lastUpdateTime.lastUpdateTime().equals(link.updatedAt()) && link.updatedAt() != null) {
+                linkUpdates.add(new UpdateLink(
+                    link.id(),
+                    URI.create(link.url()),
+                    "Произошли изменения",
+                    getChatIds(link.id())
+                ));
             }
+            linkRepository.updateInfo(link.id(), lastUpdateTime.lastUpdateTime());
+        }
+
+        log.info("Sending updates: {}", linkUpdates);
+        for (UpdateLink linkUpdate : linkUpdates) {
+            botClient.sendUpdate(linkUpdate);
         }
     }
-}
 
+    private List<Long> getChatIds(long id) {
+        List<Chat> chats = chatLinkRepository.findAllByLinkId(id);
+        return chats.stream().map(Chat::chatId).toList();
+    }
+}

@@ -1,69 +1,59 @@
 package edu.java.service.link.jdbc;
 
-import edu.java.client.link_information.LinkInfoReceiver;
 import edu.java.dto.AddLinkRequest;
+import edu.java.dto.LinkData;
 import edu.java.dto.ListLinksResponse;
 import edu.java.dto.RemoveLinkRequest;
 import edu.java.dto.ResponseLink;
-import edu.java.exception.ChatNotAuthorizedException;
-import edu.java.exception.LinkAlreadyTrackedException;
-import edu.java.repository.chat.ChatRepository;
+import edu.java.exception.LinkNotFoundException;
+import edu.java.exception.UnsupportedLinkTypeException;
+import edu.java.link_type_resolver.LinkType;
+import edu.java.link_type_resolver.LinkTypeResolver;
 import edu.java.repository.chat_link.ChatLinkRepository;
 import edu.java.repository.link.LinkRepository;
 import edu.java.service.link.LinkService;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.net.URI;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class JdbcLinkService implements LinkService {
     private final LinkRepository linkRepository;
     private final ChatLinkRepository chatLinkRepository;
-    private final ChatRepository chatRepository;
-    private final List<LinkInfoReceiver> clients;
+    private final LinkTypeResolver linkTypeResolver;
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public ListLinksResponse getAllLinks(Long chatId) {
-        return linkRepository.findAll(chatId);
-    }
-
-
-    @Override
-    public ResponseLink removeLink(long chatId, RemoveLinkRequest removeLinkRequest) {
-        ResponseLink response = chatLinkRepository.remove(chatId, removeLinkRequest.linkId());
-        if (!chatLinkRepository.hasChats(removeLinkRequest.linkId())) {
-            return linkRepository.remove(chatId, removeLinkRequest);
-        }
-        return response;
+        return linkRepository.findAllByChatId(chatId);
     }
 
     @Override
     @Transactional
     public ResponseLink addLink(Long chatId, AddLinkRequest addLinkRequest) {
-        if (!chatRepository.isInTable(chatId)) {
-            throw new ChatNotAuthorizedException();
+        LinkType linkType = linkTypeResolver.resolve(addLinkRequest.link());
+        if (linkType.equals(LinkType.UNKNOWN)) {
+            throw new UnsupportedLinkTypeException(addLinkRequest);
         }
-        for (LinkInfoReceiver client : clients) {
-            if (client.isValidate(URI.create(addLinkRequest.link()))) {
-                Long linkId = linkRepository.getLinkId(addLinkRequest.link().toString());
-                if (linkId == 0) {
-                    client.receiveLastUpdateTime(URI.create(addLinkRequest.link()));
-                    ResponseLink response = linkRepository.add(chatId, addLinkRequest);
-                    chatLinkRepository.add(chatId, response.linkId());
-                    return response;
-                }
-                if (chatLinkRepository.isTracked(chatId, linkId)) {
-                    throw new LinkAlreadyTrackedException(addLinkRequest);
-                }
-                chatLinkRepository.add(chatId, linkId);
-                return new ResponseLink(linkId, linkRepository.getData(linkId).url().toString());
-            }
+        long linkId = linkRepository.add(chatId, addLinkRequest, linkType);
+        chatLinkRepository.add(linkId, chatId);
+        return new ResponseLink(linkId, addLinkRequest.link());
+    }
+
+    @Override
+    @Transactional
+    public ResponseLink removeLink(long chatId, RemoveLinkRequest removeLinkRequest) {
+        Optional<LinkData> optionalLink = linkRepository.findById(removeLinkRequest.linkId());
+        if (optionalLink.isEmpty()) {
+            throw new LinkNotFoundException(removeLinkRequest);
         }
-        throw new UnsupportedOperationException(addLinkRequest.link());
+        LinkData link = optionalLink.get();
+        chatLinkRepository.remove(link.id(), chatId);
+        if (chatLinkRepository.findAllByLinkId(link.id()).isEmpty()) {
+            linkRepository.remove(link.id());
+        }
+        return new ResponseLink(link.id(), link.url());
     }
 }
