@@ -11,5 +11,4 @@ import org.springframework.validation.annotation.Validated;
 public final class ApplicationConfig {
     private @NotEmpty String token;
 
-
 }

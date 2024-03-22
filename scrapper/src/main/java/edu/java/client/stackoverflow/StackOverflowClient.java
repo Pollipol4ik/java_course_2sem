@@ -28,7 +28,6 @@ public class StackOverflowClient extends AbstractClient<StackOverflowService> im
         return LinkType.STACKOVERFLOW;
     }
 
-
     @Override
     public LastUpdateTime receiveLastUpdateTime(URI url) {
         Matcher matcher = STACKOVERFLOW_LINK_PATTERN.matcher(url.toString());

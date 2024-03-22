@@ -19,7 +19,6 @@ public class JdbcLinkRepository implements LinkRepository {
 
     private final JdbcClient jdbcClient;
 
-
     @Override
     public ListLinksResponse findAll(long chatId) {
         return new ListLinksResponse(jdbcClient.sql("""

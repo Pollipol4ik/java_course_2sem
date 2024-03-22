@@ -14,7 +14,6 @@ import static edu.java.bot.command.Command.LIST;
 import static edu.java.bot.util.MessagesUtils.NO_TRACKED_LINKS;
 import static edu.java.bot.util.MessagesUtils.TRACKED_LINKS;
 
-
 @Log4j2
 @Component
 @RequiredArgsConstructor
