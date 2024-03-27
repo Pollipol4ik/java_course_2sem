@@ -1,9 +1,15 @@
 package edu.java.repository.chat;
 
+import edu.java.dto.Chat;
+import java.util.List;
+
 public interface ChatRepository {
-    void add(Long chatId);
+    void add(long chatId);
 
-    void remove(Long chatId);
+    void remove(long chatId);
 
-    boolean isInTable(Long chatId);
+    List<Chat> findAll();
+
+    boolean doesExist(long chatId);
+
 }

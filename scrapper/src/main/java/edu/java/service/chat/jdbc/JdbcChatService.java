@@ -16,7 +16,7 @@ public class JdbcChatService implements ChatService {
     @Override
     @Transactional
     public void registerChat(Long chatId) {
-        if (chatRepository.isInTable(chatId)) {
+        if (chatRepository.doesExist(chatId)) {
             throw new ChatAlreadyRegisteredException(chatId);
         }
         chatRepository.add(chatId);
@@ -26,7 +26,7 @@ public class JdbcChatService implements ChatService {
     @Override
     @Transactional
     public void deleteChat(Long chatId) {
-        if (!chatRepository.isInTable(chatId)) {
+        if (!chatRepository.doesExist(chatId)) {
             throw new ChatNotFoundException(chatId);
         }
         chatRepository.remove(chatId);

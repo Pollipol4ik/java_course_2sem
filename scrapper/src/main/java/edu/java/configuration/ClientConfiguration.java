@@ -4,11 +4,10 @@ import edu.java.client.BotClient;
 import edu.java.client.github.GithubClient;
 import edu.java.client.link_information.LinkInfoReceiver;
 import edu.java.client.stackoverflow.StackOverflowClient;
-import java.util.HashMap;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 
 @Configuration
 public class ClientConfiguration {
@@ -19,7 +18,7 @@ public class ClientConfiguration {
     private String githubBaseUrl;
     @Value("${client.bot.base-url}")
     private String botBaseUrl;
-    @Value("${client.github.authorization-token}")
+    @Value("${client.github.token}")
     private String getGithubAuthorizationToken;
 
     @Bean
@@ -35,13 +34,13 @@ public class ClientConfiguration {
         if (githubBaseUrl.isEmpty()) {
             throw new IllegalStateException("Не указан базовый github url");
         }
-        Map<String, String> headers = new HashMap<>();
+        HttpHeaders headers = new HttpHeaders();
         if (!getGithubAuthorizationToken.isEmpty()) {
-            headers.put("Authorization", "Bearer " + getGithubAuthorizationToken);
+            headers.add("Authorization", "Bearer " + getGithubAuthorizationToken);
         }
 
         //TODO
-        return new GithubClient(githubBaseUrl);
+        return new GithubClient(githubBaseUrl, headers);
     }
 
     @Bean

@@ -24,7 +24,7 @@ public abstract class UpdateResolver {
 
     protected SendMessage resolveNext(Update update) {
         if (next == null) {
-            throw new RuntimeException("Invalid update");
+            throw new RuntimeException("No next resolver available");
         }
         return next.resolve(update);
     }

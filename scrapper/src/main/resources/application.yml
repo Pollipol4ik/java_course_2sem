@@ -2,13 +2,13 @@ app:
   scheduler:
     enable: true
     interval: 10000
-    force-check-delay: 10000
+    force-check-delay: 100000
 
 client:
   stackoverflow:
     base-url: https://api.stackexchange.com/2.3/
   github:
-    authorization-token: #YOUR TOKEN
+    token: { YOUR_TOKEN }
     base-url: https://api.github.com/
   bot:
     base-url: http://localhost:8090/

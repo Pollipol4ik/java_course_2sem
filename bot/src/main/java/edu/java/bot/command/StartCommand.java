@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Component;
 import static edu.java.bot.command.Command.START;
+import static edu.java.bot.util.MessagesUtils.CHAT_ALREADY_EXIST;
 import static edu.java.bot.util.MessagesUtils.WELCOME_MESSAGE;
 
 @Log4j2
@@ -21,10 +22,11 @@ public class StartCommand implements CommandExecutor {
         log.info("Command /start has executed");
         try {
             scrapperClient.registerChat(chatId);
+            return new SendMessage(chatId, WELCOME_MESSAGE).parseMode(ParseMode.HTML);
         } catch (Exception e) {
-            //TODO
+            log.error("Error registering chat: chat already exists");
+            return new SendMessage(chatId, CHAT_ALREADY_EXIST);
         }
-        return new SendMessage(chatId, WELCOME_MESSAGE).parseMode(ParseMode.HTML);
     }
 
     @Override

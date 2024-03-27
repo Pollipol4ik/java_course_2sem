@@ -10,6 +10,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
@@ -64,13 +65,16 @@ public class JdbcLinkRepository implements LinkRepository {
             .update();
     }
 
-    @Override
     public Optional<LinkData> findByUrl(String url) {
-        return Optional.of(jdbcClient.sql(
-                "SELECT id, url, type, updated_at, last_checked_at FROM link WHERE url = :url")
-            .param("url", url)
-            .query(LinkData.class)
-            .single());
+        try {
+            return Optional.of(jdbcClient.sql(
+                    "SELECT id, url, type, updated_at, last_checked_at FROM link WHERE url = :url")
+                .param("url", url)
+                .query(LinkData.class)
+                .single());
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     @Override

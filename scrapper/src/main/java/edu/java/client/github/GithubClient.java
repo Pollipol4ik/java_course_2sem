@@ -8,6 +8,7 @@ import edu.java.link_type_resolver.LinkType;
 import java.net.URI;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.springframework.http.HttpHeaders;
 
 public class GithubClient extends AbstractClient<GithubService> implements LinkInfoReceiver {
 
@@ -16,6 +17,10 @@ public class GithubClient extends AbstractClient<GithubService> implements LinkI
 
     public GithubClient() {
         this(DEFAULT_BASE_URL);
+    }
+
+    public GithubClient(String baseUrl, HttpHeaders headers) {
+        super(baseUrl, headers);
     }
 
     public GithubClient(String baseUrl) {

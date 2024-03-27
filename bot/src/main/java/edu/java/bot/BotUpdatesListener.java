@@ -26,6 +26,8 @@ public class BotUpdatesListener implements UpdatesListener {
 
     private void processUpdate(Update update) {
         SendMessage message = updateResolver.resolve(update);
-        telegramMessageSender.sendMessage(message);
+        if (message != null) {
+            telegramMessageSender.sendMessage(message);
+        }
     }
 }

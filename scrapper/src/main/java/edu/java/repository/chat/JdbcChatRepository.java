@@ -1,30 +1,44 @@
 package edu.java.repository.chat;
 
+import edu.java.dto.Chat;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
 public class JdbcChatRepository implements ChatRepository {
-    private final JdbcTemplate jdbcTemplate;
+    private static final String PARAM_CHAT_ID = "chatId";
+    private final JdbcClient jdbcClient;
 
     @Override
-    public void add(Long chatId) {
-        jdbcTemplate.update("INSERT INTO chat (id) VALUES (?)", chatId);
+    public void add(long chatId) {
+        jdbcClient.sql("INSERT INTO chat(id) VALUES (:" + PARAM_CHAT_ID + ")")
+            .param(PARAM_CHAT_ID, chatId)
+            .update();
     }
 
     @Override
-    public void remove(Long chatId) {
-        jdbcTemplate.update("DELETE FROM chat WHERE id = (?)", chatId);
+    public void remove(long chatId) {
+        jdbcClient.sql("DELETE FROM chat WHERE id = :" + PARAM_CHAT_ID)
+            .param(PARAM_CHAT_ID, chatId)
+            .update();
     }
 
     @Override
-    public boolean isInTable(Long chatId) {
-        return Boolean.TRUE.equals(jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM chat WHERE id = ?",
-            Boolean.class,
-            chatId
-        ));
+    public List<Chat> findAll() {
+        return jdbcClient.sql("SELECT id FROM chat")
+            .query(Chat.class)
+            .list();
+    }
+
+    @Override
+    public boolean doesExist(long chatId) {
+        return jdbcClient.sql("SELECT id FROM chat WHERE id = :" + PARAM_CHAT_ID)
+            .param(PARAM_CHAT_ID, chatId)
+            .query(Chat.class)
+            .optional()
+            .isPresent();
     }
 }
