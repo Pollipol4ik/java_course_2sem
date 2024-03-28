@@ -1,6 +1,7 @@
 package edu.java.client;
 
 import java.lang.reflect.ParameterizedType;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.support.WebClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
@@ -10,7 +11,12 @@ public abstract class AbstractClient<S> {
     protected final S service;
 
     public AbstractClient(String baseUrl) {
+        this(baseUrl, HttpHeaders.EMPTY);
+    }
+
+    public AbstractClient(String baseUrl, HttpHeaders headers) {
         WebClient webClient = WebClient.builder()
+            .defaultHeaders(httpHeaders -> httpHeaders.putAll(headers))
             .baseUrl(baseUrl)
             .build();
         WebClientAdapter webClientAdapter = WebClientAdapter.create(webClient);

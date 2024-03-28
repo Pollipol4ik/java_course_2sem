@@ -1,6 +1,6 @@
 package edu.java.controller;
 
-import edu.java.service.ChatService;
+import edu.java.service.chat.ChatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.DeleteMapping;

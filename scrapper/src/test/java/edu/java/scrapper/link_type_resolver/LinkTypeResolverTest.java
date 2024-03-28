@@ -22,7 +22,10 @@ public class LinkTypeResolverTest {
                 LinkType.STACKOVERFLOW
             ),
             Arguments.of("https://stackoverflow.com/questions/78055712", LinkType.STACKOVERFLOW),
-            Arguments.of("https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#io.rest-client.webclient", LinkType.UNKNOWN)
+            Arguments.of(
+                "https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#io.rest-client.webclient",
+                LinkType.UNKNOWN
+            )
         );
     }
 

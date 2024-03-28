@@ -1,6 +1,5 @@
 package edu.java.bot.command;
 
-
 import com.pengrad.telegrambot.request.SendMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 

@@ -37,4 +37,5 @@ public class ScrapperClient extends AbstractClient<ScrapperService> {
     public void deleteChat(long chatId) {
         service.deleteChat(chatId);
     }
+
 }
