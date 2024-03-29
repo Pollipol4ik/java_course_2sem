@@ -4,29 +4,33 @@ import edu.java.exception.ChatAlreadyRegisteredException;
 import edu.java.exception.ChatNotFoundException;
 import edu.java.repository.chat.ChatRepository;
 import edu.java.service.chat.jdbc.JdbcChatService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
+
 public class JdbcChatServiceTest {
 
-    @Mock
     private ChatRepository chatRepository;
 
-    @InjectMocks
     private JdbcChatService chatService;
+
+    @BeforeEach
+    void init() {
+        chatRepository = mock(ChatRepository.class);
+        chatService = new JdbcChatService(chatRepository);
+    }
 
     @Test
     public void registerChat_shouldThrowChatAlreadyRegisteredException() {
         // Arrange
+
         long chatId = 1L;
         when(chatRepository.doesExist(chatId)).thenReturn(true);
 

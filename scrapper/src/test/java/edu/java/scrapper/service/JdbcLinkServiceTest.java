@@ -1,5 +1,7 @@
-package edu.java.service.link.jdbc;
+package edu.java.scrapper.service;
 
+import edu.java.client.link_information.LinkInfoReceiver;
+import edu.java.client.link_information.LinkInformationReceiverProvider;
 import edu.java.dto.AddLinkRequest;
 import edu.java.dto.Chat;
 import edu.java.dto.LinkData;
@@ -12,37 +14,46 @@ import edu.java.link_type_resolver.LinkType;
 import edu.java.link_type_resolver.LinkTypeResolver;
 import edu.java.repository.chat_link.ChatLinkRepository;
 import edu.java.repository.link.LinkRepository;
+import edu.java.service.link.jdbc.JdbcLinkService;
 import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
 public class JdbcLinkServiceTest {
 
-    @Mock
+
     private LinkRepository linkRepository;
 
-    @Mock
     private ChatLinkRepository chatLinkRepository;
 
-    @Mock
     private LinkTypeResolver linkTypeResolver;
 
-    @InjectMocks
     private JdbcLinkService linkService;
+    private LinkInformationReceiverProvider linkInformationReceiverManager;
+    private LinkInfoReceiver linkInfoReceiver;
+
+    @BeforeEach
+    void init() {
+        linkRepository = mock(LinkRepository.class);
+        chatLinkRepository = mock(ChatLinkRepository.class);
+        linkTypeResolver = mock(LinkTypeResolver.class);
+        linkInformationReceiverManager = mock(LinkInformationReceiverProvider.class);
+        linkInfoReceiver = mock(LinkInfoReceiver.class);
+        linkService =
+            new JdbcLinkService(linkRepository, chatLinkRepository, linkTypeResolver, linkInformationReceiverManager);
+    }
 
     @Test
     public void getAllLinks_shouldReturnAllLinksForChat() {
@@ -66,6 +77,8 @@ public class JdbcLinkServiceTest {
         LinkType linkType = LinkType.GITHUB;
         when(linkTypeResolver.resolve(anyString())).thenReturn(linkType);
         when(linkRepository.add(anyLong(), any(AddLinkRequest.class), any(LinkType.class))).thenReturn(1L);
+        when(linkInformationReceiverManager.getReceiver(linkType)).thenReturn(linkInfoReceiver);
+        when(linkInfoReceiver.receiveLastUpdateTime(any())).thenReturn(null);
 
         // Act
         ResponseLink responseLink = linkService.addLink(chatId, addLinkRequest);
