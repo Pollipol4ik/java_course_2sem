@@ -34,6 +34,14 @@ public class ListCommand implements CommandExecutor {
 
     private SendMessage buildMessage(long chatId) {
         ListLinksResponse listLinksResponse = scrapperClient.getAllTrackedLinks(chatId);
+        if (listLinksResponse == null) {
+            log.info("Failed to retrieve tracked links for chatId: {}", chatId);
+            return new SendMessage(
+                chatId,
+                "Не удалось получить отслеживаемые ссылки. Пожалуйста, попробуйте еще раз позже."
+            );
+
+        }
         List<ResponseLink> links = listLinksResponse.links();
         if (links.isEmpty()) {
             return new SendMessage(chatId, NO_TRACKED_LINKS);

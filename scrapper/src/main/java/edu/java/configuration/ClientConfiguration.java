@@ -1,13 +1,13 @@
 package edu.java.configuration;
 
-import edu.java.client.BotClient;
 import edu.java.client.github.GithubClient;
-import edu.java.client.link_information.LinkInfoReceiver;
+import edu.java.client.github.events.EventProvider;
 import edu.java.client.stackoverflow.StackOverflowClient;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpHeaders;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class ClientConfiguration {
@@ -18,36 +18,27 @@ public class ClientConfiguration {
     private String githubBaseUrl;
     @Value("${client.bot.base-url}")
     private String botBaseUrl;
-    @Value("${client.github.token}")
-    private String getGithubAuthorizationToken;
 
     @Bean
-    public LinkInfoReceiver stackOverflowClient() {
-        if (stackOverflowBaseUrl.isEmpty()) {
-            throw new IllegalStateException("Не указан базовый stackoverflow url");
+    public WebClient webClient() {
+        return (botBaseUrl.isEmpty()) ? WebClient.builder().baseUrl("http://localhost:8090").build()
+            : WebClient.builder().baseUrl(botBaseUrl).build();
+    }
+
+    @Bean
+    public GithubClient gitHubClient(List<EventProvider> eventProviderList) {
+        if (githubBaseUrl == null || githubBaseUrl.isEmpty()) {
+            return new GithubClient(eventProviderList);
+        }
+        return new GithubClient(githubBaseUrl, eventProviderList);
+    }
+
+    @Bean
+    public StackOverflowClient stackOverflowClient() {
+        if (stackOverflowBaseUrl == null || stackOverflowBaseUrl.isEmpty()) {
+            return new StackOverflowClient();
         }
         return new StackOverflowClient(stackOverflowBaseUrl);
     }
 
-    @Bean
-    public LinkInfoReceiver githubClient() {
-        if (githubBaseUrl.isEmpty()) {
-            throw new IllegalStateException("Не указан базовый github url");
-        }
-        HttpHeaders headers = new HttpHeaders();
-        if (!getGithubAuthorizationToken.isEmpty()) {
-            headers.add("Authorization", "Bearer " + getGithubAuthorizationToken);
-        }
-
-        //TODO
-        return new GithubClient(githubBaseUrl, headers);
-    }
-
-    @Bean
-    public BotClient botClient() {
-        if (botBaseUrl.isEmpty()) {
-            throw new IllegalStateException("Не указан базовый bot url");
-        }
-        return new BotClient(botBaseUrl);
-    }
 }

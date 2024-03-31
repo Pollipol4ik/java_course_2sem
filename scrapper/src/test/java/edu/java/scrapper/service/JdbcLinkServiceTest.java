@@ -33,7 +33,6 @@ import static org.mockito.Mockito.when;
 
 public class JdbcLinkServiceTest {
 
-
     private LinkRepository linkRepository;
 
     private ChatLinkRepository chatLinkRepository;
