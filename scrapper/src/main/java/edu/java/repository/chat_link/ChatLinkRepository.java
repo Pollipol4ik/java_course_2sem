@@ -16,4 +16,6 @@ public interface ChatLinkRepository {
     List<Chat> findAllByLinkId(long linkId);
 
     List<ChatLinkResponse> findAllFiltered(OffsetDateTime time);
+
+    boolean isTracked(Long chatId, Long linkId);
 }

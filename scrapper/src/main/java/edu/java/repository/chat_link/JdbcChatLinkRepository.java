@@ -64,4 +64,9 @@ public class JdbcChatLinkRepository implements ChatLinkRepository {
             .list();
     }
 
+    @Override
+    public boolean isTracked(Long chatId, Long linkId) {
+        return false;
+    }
+
 }

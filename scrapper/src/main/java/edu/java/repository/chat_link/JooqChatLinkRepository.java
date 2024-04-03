@@ -66,4 +66,10 @@ public class JooqChatLinkRepository implements ChatLinkRepository {
             .map(entry -> new ChatLinkResponse(entry.getKey(), new HashSet<>(entry.getValue())))
             .toList();
     }
+
+    @Override
+    public boolean isTracked(Long chatId, Long linkId) {
+        long count = context.fetchCount(CHAT_LINK, CHAT_LINK.LINK_ID.eq(linkId).and(CHAT_LINK.CHAT_ID.eq(chatId)));
+        return count > 0;
+    }
 }
