@@ -1,6 +1,7 @@
 package edu.java.client;
 
 import edu.java.dto.UpdateLink;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -11,6 +12,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class BotClient {
     private final WebClient webClient;
 
+    @Retry(name = "basic")
     public void sendUpdate(UpdateLink linkUpdate) {
         webClient
             .post()

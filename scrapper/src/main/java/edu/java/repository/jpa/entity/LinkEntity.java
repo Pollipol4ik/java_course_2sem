@@ -50,7 +50,8 @@ public class LinkEntity {
     @ManyToMany(mappedBy = "links", fetch = FetchType.LAZY)
     private Set<ChatEntity> chats = new HashSet<>();
 
-    public LinkEntity(String url) {
+    public LinkEntity(String url, String type) {
         this.url = url;
+        this.type = type;
     }
 }

@@ -47,19 +47,20 @@ public class JpaLinkService implements LinkService {
         ChatEntity chatEntity = chatRepository.findById(chatId).orElseThrow(ChatNotAuthorizedException::new);
         for (LinkInfoReceiver client : clients) {
             if (client.isValidate(URI.create(addLinkRequest.link()))) {
-                Optional<LinkEntity> optionalLinkEntity = linkRepository.findByUrl(addLinkRequest.link().toString());
-                LinkEntity link;
+                Optional<LinkEntity> optionalLinkEntity = linkRepository.findByUrl(addLinkRequest.link());
+                LinkEntity linkEntity;
                 if (optionalLinkEntity.isEmpty()) {
                     client.receiveLastUpdateTime(URI.create(addLinkRequest.link()));
-                    link = linkRepository.save(new LinkEntity(addLinkRequest.link().toString()));
+                    linkEntity =
+                        linkRepository.save(new LinkEntity(addLinkRequest.link(), client.getLinkType().name()));
                 } else {
-                    link = optionalLinkEntity.get();
-                    if (chatEntity.getLinks().contains(link)) {
+                    linkEntity = optionalLinkEntity.get();
+                    if (chatEntity.getLinks().contains(linkEntity)) {
                         throw new LinkAlreadyTrackedException(addLinkRequest);
                     }
                 }
-                chatEntity.addLink(link);
-                return new ResponseLink(link.getLinkId(), link.getUrl());
+                chatEntity.addLink(linkEntity);
+                return new ResponseLink(linkEntity.getLinkId(), linkEntity.getUrl());
             }
         }
         throw new UnsupportedLinkTypeException(addLinkRequest.link());

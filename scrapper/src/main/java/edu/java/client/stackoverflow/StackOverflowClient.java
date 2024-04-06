@@ -5,6 +5,7 @@ import edu.java.client.dto.stackoverflow.QuestionResponse;
 import edu.java.client.link_information.LinkInfo;
 import edu.java.exception.UnsupportedLinkTypeException;
 import edu.java.link_type_resolver.LinkType;
+import io.github.resilience4j.retry.annotation.Retry;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +37,7 @@ public class StackOverflowClient extends AbstractClient {
     }
 
     @Override
+    @Retry(name = "basic")
     public List<LinkInfo> receiveLastUpdateTime(URI url) {
         Matcher matcher = STACKOVERFLOW_LINK_PATTERN.matcher(url.toString());
         if (!matcher.matches()) {
@@ -63,6 +65,7 @@ public class StackOverflowClient extends AbstractClient {
     }
 
     @Override
+    @Retry(name = "basic")
     public boolean isValidate(URI url) {
         return STACKOVERFLOW_LINK_PATTERN.matcher(url.toString()).matches();
     }

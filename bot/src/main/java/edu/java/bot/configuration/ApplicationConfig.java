@@ -1,14 +1,25 @@
 package edu.java.bot.configuration;
 
 import jakarta.validation.constraints.NotEmpty;
-import lombok.Data;
+import java.util.List;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.validation.annotation.Validated;
 
 @Validated
-@Data
 @ConfigurationProperties(prefix = "app", ignoreUnknownFields = false)
-public final class ApplicationConfig {
-    private @NotEmpty String token;
+public record ApplicationConfig(
+    @NotEmpty
+    String token,
+    Retry retry
+) {
+    @Bean
+    public Retry retry() {
+        return retry;
+    }
 
+    public record Retry(int maxAttempts, List<Class<? extends Throwable>> exceptions, Backoff backoff) {
+        public record Backoff(Long delay, Long maxDelay, Double multiplier) {
+        }
+    }
 }

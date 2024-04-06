@@ -6,6 +6,7 @@ import edu.java.client.github.events.GitHubEvent;
 import edu.java.client.link_information.LinkInfo;
 import edu.java.exception.UnsupportedLinkTypeException;
 import edu.java.link_type_resolver.LinkType;
+import io.github.resilience4j.retry.annotation.Retry;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
@@ -40,6 +41,7 @@ public class GithubClient extends AbstractClient {
 
     @SuppressWarnings("checkstyle:MultipleStringLiterals")
     @Override
+    @Retry(name = "basic")
     public List<LinkInfo> receiveLastUpdateTime(URI url) {
         if (!isValidate(url)) {
             return null;
@@ -75,6 +77,7 @@ public class GithubClient extends AbstractClient {
     }
 
     @Override
+    @Retry(name = "basic")
     public boolean isValidate(URI url) {
         return REPOSITORY_PATTERN.matcher(url.toString()).matches();
     }

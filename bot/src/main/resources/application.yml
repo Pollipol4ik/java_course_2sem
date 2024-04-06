@@ -1,6 +1,16 @@
 app:
   token: ${TOKEN:}
 
+retry:
+  max-attempts: 3
+  exceptions:
+    - java.lang.RuntimeException
+    - java.net.SocketException
+  backoff:
+    delay: 1000
+    max-delay: 5000
+    multiplier: 1
+
 client:
   scrapper:
     base-url: http://localhost:8080/
@@ -12,6 +22,13 @@ spring:
     enabled: false
   jackson:
     time-zone: UTC
+  cache:
+    jcache:
+      provider: com.github.benmanes.caffeine.jcache.spi.CaffeineCachingProvider
+    caffeine:
+      spec: maximumSize=10000,expireAfterAccess=3600s
+    cache-names:
+      - rate-limit-bucket
 
 springdoc:
   swagger-ui:
@@ -22,3 +39,29 @@ server:
 
 logging:
   config: classpath:log4j2-plain.xml
+
+bucket4j:
+  enabled: true
+  filters:
+    - cache-name: rate-limit-bucket
+      url: .*
+      http-status-code: too_many_requests
+      rate-limits:
+        - bandwidths:
+            - capacity: 10
+              time: 1
+              unit: minutes
+              refill-speed: interval
+          cache-key: getRemoteAddr()
+          skip-condition: '@bucket4jWhiteListService.isWhiteList(getRemoteAddr())'
+
+clients-whitelist: 127.0.0.1
+
+resilience4j:
+  retry:
+    instances:
+      basic:
+        enable-exponential-backoff: true
+        exponential-backoff-multiplier: 2
+        max-attempts: 5
+        wait-duration: 1s
