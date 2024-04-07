@@ -8,7 +8,7 @@ client:
   stackoverflow:
     base-url: https://api.stackexchange.com/2.3/
   github:
-    token: { YOUR_TOKEN }
+    token: ${YOUR_TOKEN:}
     base-url: https://api.github.com/
   bot:
     base-url: http://localhost:8090/

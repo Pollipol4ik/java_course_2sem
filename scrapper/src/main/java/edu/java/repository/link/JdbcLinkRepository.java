@@ -23,7 +23,7 @@ public class JdbcLinkRepository implements LinkRepository {
     @Override
     public ListLinksResponse findAll(long chatId) {
         return new ListLinksResponse(jdbcClient.sql("""
-                SELECT id, url AS link FROM link""")
+                SELECT id as linkId, url as link FROM link""")
             .query(ResponseLink.class)
             .list());
     }
