@@ -6,8 +6,10 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.stereotype.Repository;
 
 @RequiredArgsConstructor
+@Repository
 public class JdbcChatLinkRepository implements ChatLinkRepository {
 
     private final JdbcClient jdbcClient;
