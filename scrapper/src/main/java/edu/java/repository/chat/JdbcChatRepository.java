@@ -33,7 +33,7 @@ public class JdbcChatRepository implements ChatRepository {
 
     @Override
     public boolean doesExist(long chatId) {
-        return jdbcClient.sql("SELECT id FROM chat WHERE id = :" + PARAM_CHAT_ID)
+        return jdbcClient.sql("SELECT id AS chat_id FROM chat WHERE id = :" + PARAM_CHAT_ID)
             .param(PARAM_CHAT_ID, chatId)
             .query(Chat.class)
             .optional()
