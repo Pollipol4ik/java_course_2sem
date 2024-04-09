@@ -14,10 +14,8 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.jooq.DSLContext;
 import org.jooq.Record;
-import org.springframework.stereotype.Repository;
 
 @RequiredArgsConstructor
-@Repository
 @SuppressWarnings("checkstyle:MultipleStringLiterals")
 public class JooqLinkRepository implements LinkRepository {
     private final DSLContext context;

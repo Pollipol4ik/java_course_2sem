@@ -3,6 +3,8 @@ app:
     enable: true
     interval: 10s
     force-check-delay: 5s
+  database-access-type: jooq
+
 
 client:
   stackoverflow:
