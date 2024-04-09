@@ -38,5 +38,7 @@ public class JdbcChatRepository implements ChatRepository {
             .query(Chat.class)
             .optional()
             .isPresent();
+
     }
+
 }

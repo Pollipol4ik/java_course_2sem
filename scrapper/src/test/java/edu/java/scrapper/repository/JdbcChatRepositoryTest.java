@@ -25,7 +25,7 @@ public class JdbcChatRepositoryTest extends IntegrationEnvironment {
     static void jdbcProperties(DynamicPropertyRegistry registry) {
         registry.add("app.database-access-type", () -> "jdbc");
     }
-
+  
     @Test
     @Transactional
     @Rollback
@@ -67,7 +67,9 @@ public class JdbcChatRepositoryTest extends IntegrationEnvironment {
     public void doesExist_shouldReturnTrue_whenChatIdExists() {
         //Arrange
         long chatId = 1879L;
+
         chatRepository.add(chatId);
+
         //Act
         boolean inTable = chatRepository.doesExist(chatId);
         //Assert

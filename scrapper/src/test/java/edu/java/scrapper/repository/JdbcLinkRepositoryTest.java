@@ -29,7 +29,6 @@ public class JdbcLinkRepositoryTest extends IntegrationEnvironment {
 
     @Autowired
     private LinkRepository linkRepository;
-
     @DynamicPropertySource
     static void jdbcProperties(DynamicPropertyRegistry registry) {
         registry.add("app.database-access-type", () -> "jdbc");
