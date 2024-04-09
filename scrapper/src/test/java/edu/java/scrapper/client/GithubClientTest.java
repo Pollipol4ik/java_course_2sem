@@ -21,9 +21,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 public class GithubClientTest {
-    private static final String API_LINK = "/repos/Pollipol4ik/test-repository";
+    private static final String API_LINK = "/repos/Pollipol4ik/test-repository/events";
     private static final String LINK = "https://github.com/repos/Pollipol4ik/test-repository";
-    private static final String UNKNOWN_LINK = "https://youtube.com";
+    private static final String NOT_GITHUB_LINK = "https://youtube.com";
     private final List<EventProvider> providers = List.of(new PushEventProvider());
     private WireMockServer server;
 
@@ -48,15 +48,30 @@ public class GithubClientTest {
                         "created_at": "2024-03-16T19:22:17Z"
                       }
                     ]""")));
-        server.stubFor(get(urlPathMatching("/repos/aboba/abobus/events"))
+        server.stubFor(get(urlPathMatching("/repos/dsdvSD/absdbbus/events"))
             .willReturn(aResponse()
                 .withStatus(404)));
         server.start();
     }
 
     @Test
+    @DisplayName("Existing GitHub repository link test")
+    public void fetchData_shouldReturnCorrectData_whenRepositoryExists() {
+        //Arrange
+        LinkInfoReceiver client = new GithubClient(server.baseUrl(), providers);
+        URI url = URI.create(LINK);
+        String title =
+            "Пользователь <b>Pollipol4ik</b> запушил в репозиторий новые коммиты в ветку \"/master\" \uD83E\uDD70: ";
+        //Act
+        List<LinkInfo> info = client.receiveLastUpdateTime(url);
+        //Assert
+        assertThat(info.get(0)).extracting(LinkInfo::url, LinkInfo::title)
+            .contains(url, title);
+    }
+
+    @Test
     @DisplayName("Not updated GitHub repository link test")
-    public void receiveLastUpdateTime_shouldEmptyList_whenRepositoryWasNotUpdated() {
+    public void fetchData_shouldEmptyList_whenRepositoryWasNotUpdated() {
         //Arrange
         String oldApiLinkEvents = "/repos/Pollipol4ik/test-repository/events";
         String oldApiLink = "/repos/Pollipol4ik/test-repository";
@@ -87,10 +102,10 @@ public class GithubClientTest {
 
     @Test
     @DisplayName("Nonexistent GitHub repository link test")
-    public void receiveLastUpdateTime_shouldThrowUnsupportedLinkTypeException_whenRepositoryDoesNotExist() {
+    public void fetchData_shouldThrowLinkNotSupportedException_whenRepositoryDoesNotExist() {
         //Arrange
         LinkInfoReceiver client = new GithubClient(server.baseUrl(), providers);
-        URI url = URI.create("https://github.com/repos/Pollipol4ik/test-repositor");
+        URI url = URI.create("https://github.com/repos/dbbfdndfx/adsbDbfbs");
         //Expect
         assertThatThrownBy(() -> client.receiveLastUpdateTime(url))
             .isInstanceOf(UnsupportedLinkTypeException.class);
@@ -98,11 +113,11 @@ public class GithubClientTest {
 
     @Test
     @DisplayName("Not GitHub link test")
-    public void receiveLastUpdateTime_shouldReturnNull_whenLinkDoesNotSupport() {
+    public void fetchData_shouldReturnNull_whenLinkDoesNotSupport() {
         //Arrange
         LinkInfoReceiver client = new GithubClient(server.baseUrl(), providers);
         //Act
-        List<LinkInfo> info = client.receiveLastUpdateTime(URI.create(UNKNOWN_LINK));
+        List<LinkInfo> info = client.receiveLastUpdateTime(URI.create(NOT_GITHUB_LINK));
         //Assert
         assertThat(info).isNull();
     }
@@ -124,7 +139,7 @@ public class GithubClientTest {
         //Arrange
         LinkInfoReceiver client = new GithubClient(server.baseUrl(), providers);
         //Act
-        boolean response = client.isValidate(URI.create(UNKNOWN_LINK));
+        boolean response = client.isValidate(URI.create(NOT_GITHUB_LINK));
         //Assert
         assertThat(response).isFalse();
     }

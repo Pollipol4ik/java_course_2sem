@@ -65,6 +65,7 @@ public class JdbcLinkRepository implements LinkRepository {
             .update();
     }
 
+    @Override
     public Optional<LinkData> findByUrl(String url) {
         try {
             return Optional.of(jdbcClient.sql(
