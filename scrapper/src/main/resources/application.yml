@@ -5,6 +5,7 @@ app:
     force-check-delay: 5s
   database-access-type: jpa
 
+
 client:
   stackoverflow:
     base-url: https://api.stackexchange.com/2.3/
