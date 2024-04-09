@@ -39,16 +39,4 @@ public class StackOverflowClientTest {
         wireMockServer.stop();
     }
 
-//    @Test
-//    @DisplayName("StackOverflowClient#receiveLastUpdateTime test")
-//    public void receiveLastUpdateTime_shouldReturnCorrectResponse() {
-//        LinkInfoReceiver stackOverflowClient =
-//            new StackOverflowClient(wireMockServer.baseUrl());
-//
-//        LinkInfo actual =
-//            stackOverflowClient.receiveLastUpdateTime(URI.create(
-//                "https://stackoverflow.com/questions/78055703/principle-of-reverse-proxy-with-docker-compose"));
-//
-//        assertThat(actual.lastUpdateTime()).isNotNull();
-//    }
 }

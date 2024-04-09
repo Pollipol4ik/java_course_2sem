@@ -1,59 +1,151 @@
-//package edu.java.scrapper.client;
-//
-//import com.github.tomakehurst.wiremock.WireMockServer;
-//import edu.java.client.github.GithubClient;
-//import edu.java.client.link_information.LastUpdateTime;
-//import edu.java.client.link_information.LinkInfoReceiver;
-//import java.net.URI;
-//import java.time.OffsetDateTime;
-//import org.junit.jupiter.api.AfterAll;
-//import org.junit.jupiter.api.BeforeAll;
-//import org.junit.jupiter.api.DisplayName;
-//import org.junit.jupiter.api.Test;
-//import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-//import static com.github.tomakehurst.wiremock.client.WireMock.configureFor;
-//import static com.github.tomakehurst.wiremock.client.WireMock.get;
-//import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-//import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
-//import static org.assertj.core.api.Assertions.assertThat;
-//
-//public class GithubClientTest {
-//
-//    private static WireMockServer wireMockServer;
-//
-//    @BeforeAll
-//    public static void setUp() {
-//        String url = "/repos/Pollipol4ik/java_course_2sem";
-//        wireMockServer = new WireMockServer(wireMockConfig().dynamicPort());
-//        wireMockServer.start();
-//        configureFor(wireMockServer.port());
-//
-//        String currentDateTime = OffsetDateTime.now().toString();
-//
-//        wireMockServer.stubFor(get(urlEqualTo(url))
-//            .willReturn(aResponse()
-//                .withStatus(200)
-//                .withHeader("Content-Type", "application/json")
-//                .withBody("""
-//                    {
-//                        "full_name": "Pollipol4ik/java_course_2sem",
-//                        "updated_at": "%s"
-//                    }
-//                    """.formatted(currentDateTime))));
-//    }
-//
-//    @AfterAll
-//    public static void tearDown() {
-//        wireMockServer.stop();
-//    }
-//
-//    @Test
-//    @DisplayName("GithubClient#receiveLastUpdateTime test")
-//    public void receiveLastUpdateTime_shouldReturnCorrectResponse() {
-//        LinkInfoReceiver client = new GithubClient(wireMockServer.baseUrl());
-//        LastUpdateTime actual =
-//            client.receiveLastUpdateTime(URI.create("https://github.com/Pollipol4ik/java_course_2sem"));
-//        assertThat(actual).isNotNull();
-//        assertThat(actual.lastUpdateTime().toLocalDate()).isEqualTo(OffsetDateTime.now().toLocalDate());
-//    }
-//}
+package edu.java.scrapper.client;
+
+import com.github.tomakehurst.wiremock.WireMockServer;
+import edu.java.client.github.GithubClient;
+import edu.java.client.github.events.EventProvider;
+import edu.java.client.github.events.PushEventProvider;
+import edu.java.client.link_information.LinkInfo;
+import edu.java.client.link_information.LinkInfoReceiver;
+import edu.java.exception.UnsupportedLinkTypeException;
+import java.net.URI;
+import java.util.List;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
+import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+
+public class GithubClientTest {
+    private static final String API_LINK = "/repos/Pollipol4ik/test-repository/events";
+    private static final String LINK = "https://github.com/repos/Pollipol4ik/test-repository";
+    private static final String NOT_GITHUB_LINK = "https://youtube.com";
+    private final List<EventProvider> providers = List.of(new PushEventProvider());
+    private WireMockServer server;
+
+    //Arrange
+    @BeforeEach
+    public void setUp() {
+        server = new WireMockServer(wireMockConfig().dynamicPort());
+        server.stubFor(get(urlPathMatching(API_LINK))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("""
+                    [
+                      {
+                        "type": "PushEvent",
+                        "payload": {
+                          "ref": "refs/heads/master"
+                        },
+                        "actor": {
+                          "login": "Pollipol4ik"
+                        },
+                        "created_at": "2024-03-16T19:22:17Z"
+                      }
+                    ]""")));
+        server.stubFor(get(urlPathMatching("/repos/dsdvSD/absdbbus/events"))
+            .willReturn(aResponse()
+                .withStatus(404)));
+        server.start();
+    }
+
+    @Test
+    @DisplayName("Existing GitHub repository link test")
+    public void fetchData_shouldReturnCorrectData_whenRepositoryExists() {
+        //Arrange
+        LinkInfoReceiver client = new GithubClient(server.baseUrl(), providers);
+        URI url = URI.create(LINK);
+        String title =
+            "Пользователь <b>Pollipol4ik</b> запушил в репозиторий новые коммиты в ветку \"/master\" \uD83E\uDD70: ";
+        //Act
+        List<LinkInfo> info = client.receiveLastUpdateTime(url);
+        //Assert
+        assertThat(info.get(0)).extracting(LinkInfo::url, LinkInfo::title)
+            .contains(url, title);
+    }
+
+    @Test
+    @DisplayName("Not updated GitHub repository link test")
+    public void fetchData_shouldEmptyList_whenRepositoryWasNotUpdated() {
+        //Arrange
+        String oldApiLinkEvents = "/repos/Pollipol4ik/test-repository/events";
+        String oldApiLink = "/repos/Pollipol4ik/test-repository";
+        String oldLink = "https://github.com/repos/Pollipol4ik/test-repository";
+        server.stubFor(get(urlPathMatching(oldApiLinkEvents))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("""
+                    [
+
+                    ]""")));
+        server.stubFor(get(urlPathMatching(oldApiLink))
+            .willReturn(aResponse()
+                .withStatus(200)
+                .withHeader("Content-Type", "application/json")
+                .withBody("""
+                    {
+                        "text": "test"
+                    }""")));
+        LinkInfoReceiver client = new GithubClient(server.baseUrl(), providers);
+        URI url = URI.create(oldLink);
+        //Act
+        List<LinkInfo> info = client.receiveLastUpdateTime(url);
+        //Assert
+        assertThat(info).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Nonexistent GitHub repository link test")
+    public void fetchData_shouldThrowLinkNotSupportedException_whenRepositoryDoesNotExist() {
+        //Arrange
+        LinkInfoReceiver client = new GithubClient(server.baseUrl(), providers);
+        URI url = URI.create("https://github.com/repos/dbbfdndfx/adsbDbfbs");
+        //Expect
+        assertThatThrownBy(() -> client.receiveLastUpdateTime(url))
+            .isInstanceOf(UnsupportedLinkTypeException.class);
+    }
+
+    @Test
+    @DisplayName("Not GitHub link test")
+    public void fetchData_shouldReturnNull_whenLinkDoesNotSupport() {
+        //Arrange
+        LinkInfoReceiver client = new GithubClient(server.baseUrl(), providers);
+        //Act
+        List<LinkInfo> info = client.receiveLastUpdateTime(URI.create(NOT_GITHUB_LINK));
+        //Assert
+        assertThat(info).isNull();
+    }
+
+    @Test
+    @DisplayName("GitHub repository link test")
+    public void isValidate_shouldReturnTrue_whenLinkIsValidated() {
+        //Arrange
+        LinkInfoReceiver client = new GithubClient(server.baseUrl(), providers);
+        //Act
+        boolean response = client.isValidate(URI.create(LINK));
+        //Assert
+        assertThat(response).isTrue();
+    }
+
+    @Test
+    @DisplayName("Not GitHub repository link test")
+    public void isValidate_shouldReturnFalse_whenLinkIsNotValidated() {
+        //Arrange
+        LinkInfoReceiver client = new GithubClient(server.baseUrl(), providers);
+        //Act
+        boolean response = client.isValidate(URI.create(NOT_GITHUB_LINK));
+        //Assert
+        assertThat(response).isFalse();
+    }
+
+    @AfterEach
+    public void shutdown() {
+        server.stop();
+    }
+}
