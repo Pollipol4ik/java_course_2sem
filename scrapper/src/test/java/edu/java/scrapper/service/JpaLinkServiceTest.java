@@ -28,7 +28,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -47,7 +47,7 @@ public class JpaLinkServiceTest extends IntegrationEnvironment {
     private EntityManager manager;
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private JdbcClient jdbcClient;
 
     @MockBean
     private GithubClient client;
@@ -63,7 +63,9 @@ public class JpaLinkServiceTest extends IntegrationEnvironment {
     public void getAllLinks_shouldReturnListLinksResponseWithEmptyList_whenChatDoesNotTrackAnyLink() {
         //Arrange
         Long chatId = 1L;
-        jdbcTemplate.update("INSERT INTO chat (id) VALUES (1)");
+        jdbcClient.sql("INSERT INTO chat(id) VALUES (:chatId)")
+            .param("chatId", chatId)
+            .update();
         //Act
         ListLinksResponse list = linkService.getAllLinks(chatId);
         //Assert
@@ -86,13 +88,24 @@ public class JpaLinkServiceTest extends IntegrationEnvironment {
     public void getAllLinks_shouldReturnListLinksResponseWithLinks_whenChatTracksLinks() {
         //Arrange
         Long chatId = 1L;
-        jdbcTemplate.update("INSERT INTO chat (id) VALUES (1)");
+        jdbcClient.sql("INSERT INTO chat(id) VALUES (:chatId)")
+            .param("chatId", chatId)
+            .update();
         String url = "google.com";
-        Long linkId =
-            jdbcTemplate.queryForObject("INSERT INTO link (url,type) VALUES (?,?) RETURNING id", Long.class, url,
-                LinkType.UNKNOWN.toString()
-            );
-        jdbcTemplate.update("INSERT INTO chat_link (chat_id, link_id) VALUES (?, ?)", chatId, linkId);
+        Long linkId = jdbcClient.sql("""
+                INSERT INTO link(url, type)
+                VALUES (:url, :link_type)
+                RETURNING id""")
+            .param("url", url)
+            .param("link_type", LinkType.UNKNOWN.name())
+            .query(Long.class)
+            .single();
+
+        jdbcClient.sql("INSERT INTO chat_link(link_id, chat_id) VALUES (:linkId, :chatId)")
+            .param("linkId", linkId)
+            .param("chatId", chatId)
+            .update();
+
         ListLinksResponse expectedList =
             new ListLinksResponse(List.of(new ResponseLink(linkId, url)));
         //Act
@@ -108,20 +121,32 @@ public class JpaLinkServiceTest extends IntegrationEnvironment {
         //Arrange
         String url = "google.com";
         Long chatId = 1L;
-        jdbcTemplate.update("INSERT INTO chat (id) VALUES (?)", chatId);
-        Long linkId =
-            jdbcTemplate.queryForObject("INSERT INTO link (url,type) VALUES (?,?) RETURNING id", Long.class, url,
-                LinkType.UNKNOWN.toString()
-            );
+        jdbcClient.sql("INSERT INTO chat(id) VALUES (:chatId)")
+            .param("chatId", chatId)
+            .update();
+        Long linkId = jdbcClient.sql("""
+                INSERT INTO link(url, type)
+                VALUES (:url, :link_type)
+                RETURNING id""")
+            .param("url", url)
+            .param("link_type", LinkType.UNKNOWN.name())
+            .query(Long.class)
+            .single();
         RemoveLinkRequest removeLinkRequest = new RemoveLinkRequest(linkId);
-        jdbcTemplate.update("INSERT INTO chat_link (chat_id, link_id) VALUES (?, ?)", chatId, linkId);
+        jdbcClient.sql("INSERT INTO chat_link(link_id, chat_id) VALUES (:linkId, :chatId)")
+            .param("linkId", linkId)
+            .param("chatId", chatId)
+            .update();
+
         ResponseLink expectedResponse = new ResponseLink(linkId, url);
         //Act
         ResponseLink response = linkService.removeLink(chatId, removeLinkRequest);
         manager.flush();
         //Assert
-        Long count =
-            jdbcTemplate.queryForObject("SELECT COUNT(id) FROM link WHERE id = ?", Long.class, linkId);
+        Long count = jdbcClient.sql("SELECT COUNT(*) FROM link WHERE id = :id")
+            .param("id", linkId)
+            .query(Long.class)
+            .single();
         assertThat(response).isEqualTo(expectedResponse);
         assertThat(count).isEqualTo(0L);
     }
@@ -134,27 +159,43 @@ public class JpaLinkServiceTest extends IntegrationEnvironment {
         String url = "google.com";
         Long chatId = 1L;
         Long secChatId = 2L;
-        jdbcTemplate.update("INSERT INTO chat (id) VALUES (?)", chatId);
-        jdbcTemplate.update("INSERT INTO chat (id) VALUES (?)", secChatId);
-        Long linkId =
-            jdbcTemplate.queryForObject("INSERT INTO link (url,type) VALUES (?,?) RETURNING id", Long.class, url,
-                LinkType.UNKNOWN.toString()
-            );
+        jdbcClient.sql("INSERT INTO chat(id) VALUES (:chatId)")
+            .param("chatId", chatId)
+            .update();
+        jdbcClient.sql("INSERT INTO chat(id) VALUES (:chatId)")
+            .param("chatId", secChatId)
+            .update();
+        Long linkId = jdbcClient.sql("""
+                INSERT INTO link(url, type)
+                VALUES (:url, :link_type)
+                RETURNING id""")
+            .param("url", url)
+            .param("link_type", LinkType.UNKNOWN.name())
+            .query(Long.class)
+            .single();
         RemoveLinkRequest removeLinkRequest = new RemoveLinkRequest(linkId);
-        jdbcTemplate.update("INSERT INTO chat_link (chat_id, link_id) VALUES (?, ?)", chatId, linkId);
-        jdbcTemplate.update("INSERT INTO chat_link (chat_id, link_id) VALUES (?, ?)", secChatId, linkId);
+        jdbcClient.sql("INSERT INTO chat_link(link_id, chat_id) VALUES (:linkId, :chatId)")
+            .param("linkId", linkId)
+            .param("chatId", chatId)
+            .update();
+
+        jdbcClient.sql("INSERT INTO chat_link(link_id, chat_id) VALUES (:linkId, :chatId)")
+            .param("linkId", linkId)
+            .param("chatId", secChatId)
+            .update();
+
         //Act
         linkService.removeLink(chatId, removeLinkRequest);
         manager.flush();
         //Assert
-        Long count =
-            jdbcTemplate.queryForObject("SELECT COUNT(id) FROM link WHERE id = ?", Long.class, linkId);
-        Long chatCount =
-            jdbcTemplate.queryForObject(
-                "SELECT COUNT(chat_id) FROM chat_link WHERE chat_id = ?",
-                Long.class,
-                chatId
-            );
+        Long count = jdbcClient.sql("SELECT COUNT(*) FROM link WHERE id = :id")
+            .param("id", linkId)
+            .query(Long.class)
+            .single();
+        Long chatCount = jdbcClient.sql("SELECT COUNT(*) FROM chat_link WHERE chat_id = :chatId")
+            .param("chatId", chatId)
+            .query(Long.class)
+            .single();
         assertThat(count).isEqualTo(1L);
         assertThat(chatCount).isEqualTo(0L);
     }
@@ -180,7 +221,9 @@ public class JpaLinkServiceTest extends IntegrationEnvironment {
     public void deleteLink_shouldThrowLinkNotFoundException_whenLinkIdIsNotInDb() {
         //Arrange
         Long chatId = 1L;
-        jdbcTemplate.update("INSERT INTO chat (id) VALUES (?)", chatId);
+        jdbcClient.sql("INSERT INTO chat(id) VALUES (:chatId)")
+            .param("chatId", chatId)
+            .update();
         Long linkId = 1L;
         RemoveLinkRequest removeLinkRequest = new RemoveLinkRequest(linkId);
         //Expected
@@ -197,11 +240,17 @@ public class JpaLinkServiceTest extends IntegrationEnvironment {
         //Arrange
         String url = "google.com";
         Long chatId = 1L;
-        jdbcTemplate.update("INSERT INTO chat (id) VALUES (?)", chatId);
-        Long linkId =
-            jdbcTemplate.queryForObject("INSERT INTO link (url,type) VALUES (?,?) RETURNING id", Long.class, url,
-                LinkType.UNKNOWN.toString()
-            );
+        jdbcClient.sql("INSERT INTO chat(id) VALUES (:chatId)")
+            .param("chatId", chatId)
+            .update();
+        Long linkId = jdbcClient.sql("""
+                INSERT INTO link(url, type)
+                VALUES (:url, :link_type)
+                RETURNING id""")
+            .param("url", url)
+            .param("link_type", LinkType.UNKNOWN.name())
+            .query(Long.class)
+            .single();
         RemoveLinkRequest removeLinkRequest = new RemoveLinkRequest(linkId);
         //Expected
         assertThatThrownBy(() -> linkService.removeLink(
@@ -219,11 +268,20 @@ public class JpaLinkServiceTest extends IntegrationEnvironment {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
         OffsetDateTime time = OffsetDateTime.now();
         String expectedTime = time.atZoneSameInstant(ZoneOffset.UTC).format(formatter);
-        Long linkId = jdbcTemplate.queryForObject(
-            "INSERT INTO link (url, type) VALUES (?, ?) RETURNING id", Long.class, url, LinkType.UNKNOWN.toString()
-        );
-        jdbcTemplate.update("UPDATE link SET updated_at = ? WHERE url = ?", time, url);
-
+        Long linkId = jdbcClient.sql("""
+                INSERT INTO link(url, type)
+                VALUES (:url, :link_type)
+                RETURNING id""")
+            .param("url", url)
+            .param("link_type", LinkType.UNKNOWN.name())
+            .query(Long.class)
+            .single();
+        jdbcClient.sql("""
+                UPDATE link SET  updated_at = :updated_at
+                WHERE id = :link_id""")
+            .param("updated_at", time)
+            .param("link_id", linkId)
+            .update();
         // Act
         Optional<LinkData> response = linkService.findById(linkId);
         manager.flush();
@@ -248,20 +306,23 @@ public class JpaLinkServiceTest extends IntegrationEnvironment {
         OffsetDateTime time = OffsetDateTime.now();
         String expectedTime = time.format(formatter);
 
-        Long linkId =
-            jdbcTemplate.queryForObject("INSERT INTO link (url,type) VALUES (?,?) RETURNING id", Long.class, url,
-                LinkType.UNKNOWN.toString()
-            );
+        Long linkId = jdbcClient.sql("""
+                INSERT INTO link(url, type)
+                VALUES (:url, :link_type)
+                RETURNING id""")
+            .param("url", url)
+            .param("link_type", LinkType.UNKNOWN.name())
+            .query(Long.class)
+            .single();
 
         //Act
         linkService.updateInfo(linkId, time);
         manager.flush();
         //Assert
-        OffsetDateTime update = jdbcTemplate.queryForObject(
-            "SELECT updated_at FROM link WHERE url = (?)",
-            OffsetDateTime.class,
-            url
-        );
+        OffsetDateTime update = jdbcClient.sql("SELECT updated_at FROM link WHERE url = :url")
+            .param("url", url)
+            .query(OffsetDateTime.class).single();
+
         assertThat(update.atZoneSameInstant(ZoneId.systemDefault()).format(formatter)).isEqualTo(expectedTime);
     }
 
@@ -275,12 +336,23 @@ public class JpaLinkServiceTest extends IntegrationEnvironment {
         Mockito.when(client.receiveLastUpdateTime(URI.create(url)))
             .thenReturn(List.of(new LinkInfo(URI.create(url), "title", OffsetDateTime.now())));
         Long chatId = 1L;
-        jdbcTemplate.update("INSERT INTO chat (id) VALUES (?)", chatId);
-        Long linkId =
-            jdbcTemplate.queryForObject("INSERT INTO link (url,type) VALUES (?,?) RETURNING id", Long.class, url,
-                LinkType.UNKNOWN.toString()
-            );
-        jdbcTemplate.update("INSERT INTO chat_link (chat_id, link_id) VALUES (?, ?)", chatId, linkId);
+        Long linkId = jdbcClient.sql("""
+                INSERT INTO link(url, type)
+                VALUES (:url, :link_type)
+                RETURNING id""")
+            .param("url", url)
+            .param("link_type", LinkType.UNKNOWN.name())
+            .query(Long.class)
+            .single();
+        jdbcClient.sql("INSERT INTO chat(id) VALUES (:chatId)")
+            .param("chatId", chatId)
+            .update();
+
+        jdbcClient.sql("INSERT INTO chat_link(link_id, chat_id) VALUES (:linkId, :chatId)")
+            .param("linkId", linkId)
+            .param("chatId", chatId)
+            .update();
+
         AddLinkRequest addLinkRequest = new AddLinkRequest(url);
         //Expected
         assertThatThrownBy(() -> linkService.addLink(
@@ -299,7 +371,9 @@ public class JpaLinkServiceTest extends IntegrationEnvironment {
         Mockito.when(client.receiveLastUpdateTime(URI.create(url)))
             .thenReturn(List.of(new LinkInfo(URI.create(url), "title", OffsetDateTime.now())));
         Long chatId = 1L;
-        jdbcTemplate.update("INSERT INTO chat (id) VALUES (?)", chatId);
+        jdbcClient.sql("INSERT INTO chat(id) VALUES (:chatId)")
+            .param("chatId", chatId)
+            .update();
         AddLinkRequest addLinkRequest = new AddLinkRequest(url);
         //Expected
         assertThatThrownBy(() -> linkService.addLink(
