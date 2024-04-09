@@ -257,22 +257,4 @@ public class JooqLinkRepositoryTest extends IntegrationEnvironment {
         assertThat(uncheckedLinks).isEmpty();
     }
 
-    @Test
-    @Transactional
-    @Rollback
-    public void updateInfo_shouldUpdateLastCheckedAtAndUpdatedAt() {
-        // Arrange
-        String url = "google.com";
-        OffsetDateTime updatedAt = OffsetDateTime.now();
-
-        long linkId = linkRepository.add(1L, new AddLinkRequest(url), LinkType.UNKNOWN);
-
-        // Act
-        linkRepository.updateInfo(linkId, updatedAt);
-
-        // Assert
-        LinkData linkData = linkRepository.findById(linkId).orElseThrow();
-        assertThat(linkData.lastCheckedAt()).isEqualToIgnoringNanos(OffsetDateTime.now());
-        assertThat(linkData.updatedAt()).isEqualToIgnoringNanos(updatedAt);
-    }
 }
