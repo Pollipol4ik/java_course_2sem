@@ -12,8 +12,10 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.stereotype.Repository;
 
 @RequiredArgsConstructor
+@Repository
 public class JdbcLinkRepository implements LinkRepository {
 
     private final JdbcClient jdbcClient;
@@ -21,7 +23,7 @@ public class JdbcLinkRepository implements LinkRepository {
     @Override
     public ListLinksResponse findAll(long chatId) {
         return new ListLinksResponse(jdbcClient.sql("""
-                SELECT id, url AS link FROM link""")
+                SELECT id as linkId, url as link FROM link""")
             .query(ResponseLink.class)
             .list());
     }
