@@ -13,7 +13,9 @@ public record ApplicationConfig(
     @NotNull
     Scheduler scheduler,
     AccessType databaseAccessType,
-    Retry retry
+    Retry retry,
+    String topic,
+    boolean useQueue
 ) {
     @Bean
     public Retry retry() {
