@@ -3,15 +3,6 @@ app:
   topic-name: "bot-scrapper-mq"
   use-queue: true
 
-retry:
-  max-attempts: 3
-  exceptions:
-    - java.lang.RuntimeException
-    - java.net.SocketException
-  backoff:
-    delay: 1000
-    max-delay: 5000
-    multiplier: 1
 
 client:
   scrapper:
