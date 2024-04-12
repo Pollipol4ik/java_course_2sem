@@ -3,7 +3,7 @@ package edu.java.bot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
-import edu.java.bot.resolver.UpdateResolver;
+import edu.java.bot.resolver.UpdateMessageResolver;
 import edu.java.bot.service.TelegramMessageSender;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class BotUpdatesListener implements UpdatesListener {
 
-    private final UpdateResolver updateResolver;
+    private final UpdateMessageResolver updateMessageResolver;
     private final TelegramMessageSender telegramMessageSender;
 
     @Override
@@ -25,7 +25,7 @@ public class BotUpdatesListener implements UpdatesListener {
     }
 
     private void processUpdate(Update update) {
-        SendMessage message = updateResolver.resolve(update);
+        SendMessage message = updateMessageResolver.resolve(update);
         if (message != null) {
             telegramMessageSender.sendMessage(message);
         }
