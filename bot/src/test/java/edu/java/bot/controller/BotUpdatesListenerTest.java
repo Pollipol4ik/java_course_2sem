@@ -3,7 +3,7 @@ package edu.java.bot.controller;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.SendMessage;
 import edu.java.bot.BotUpdatesListener;
-import edu.java.bot.resolver.UpdateResolver;
+import edu.java.bot.resolver.UpdateMessageResolver;
 import edu.java.bot.service.TelegramMessageSender;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -18,7 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 public class BotUpdatesListenerTest {
 
     @Mock
-    private UpdateResolver updateResolver;
+    private UpdateMessageResolver updateResolver;
     @Mock
     private TelegramMessageSender messageSender;
     @InjectMocks
