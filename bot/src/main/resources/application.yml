@@ -44,7 +44,7 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
         spring.json.trusted.packages: "*"
-        spring.json.value.default.type: edu.java.bot.dto.request.LinkUpdate
+        spring.json.value.default.type: edu.java.bot.dto.UpdateLink
     producer:
       bootstrap-servers: localhost:29092
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
