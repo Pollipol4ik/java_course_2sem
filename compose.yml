@@ -80,6 +80,45 @@ services:
     volumes:
       - grafana:/etc/grafana/provisioning/datasources
 
+  scrapper:
+    build:
+      context: /scrapper
+      dockerfile: scrapper.Dockerfile
+    container_name: scrapper
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgresql
+      - zookeeper
+      - kafka
+    env_file:
+      - scrapper/src/main/resources/.env
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresql:5432/scrapper
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - KAFKA_URL=kafka:19092
+      - BOT_URL=http://host.docker.internal:8090
+    networks:
+      - backend
+  bot:
+    build:
+      context: /bot
+      dockerfile: bot.Dockerfile
+    container_name: bot
+    environment:
+      - KAFKA_URL=kafka:19092
+      - SPRING_PROFILES_ACTIVE=dev
+      - SCRAPPER_URL=http://host.docker.internal:8080
+    ports:
+      - "8090:8090"
+    depends_on:
+      - zookeeper
+      - kafka
+      - scrapper
+    networks:
+      - backend
+
 volumes:
   postgresql: { }
   zookeeper: { }
