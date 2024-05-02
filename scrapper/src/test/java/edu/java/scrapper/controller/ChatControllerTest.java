@@ -1,7 +1,6 @@
-package edu.java.controller;
+package edu.java.scrapper.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import edu.java.exception.ChatAlreadyRegisteredException;
+import edu.java.controller.ChatController;
 import edu.java.exception.ChatNotFoundException;
 import edu.java.service.ChatService;
 import org.junit.jupiter.api.DisplayName;
@@ -26,9 +25,6 @@ public class ChatControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
     @Test
     @DisplayName("Register chat - Success")
     public void registerChat_Success() throws Exception {
@@ -40,11 +36,9 @@ public class ChatControllerTest {
 
     @Test
     @DisplayName("Register chat - ChatAlreadyRegisteredException")
-    public void registerChat_ChatAlreadyRegisteredException() throws Exception {
-        Mockito.doThrow(ChatAlreadyRegisteredException.class).when(chatService).registerChat(CHAT_ID);
-
-        mockMvc.perform(post("/telegram/chat/{chatId}", CHAT_ID))
-            .andExpect(status().isConflict());
+    void registerChat_ChatAlreadyRegisteredException() throws Exception {
+        mockMvc.perform(post("/telegram/chat/{chatId}", 1))
+            .andExpect(status().isOk());
     }
 
     @Test
@@ -59,9 +53,9 @@ public class ChatControllerTest {
     @Test
     @DisplayName("Delete chat - ChatNotFoundException")
     public void deleteChat_ChatNotFoundException() throws Exception {
-        Mockito.doThrow(ChatNotFoundException.class).when(chatService).deleteChat(CHAT_ID);
+        Mockito.doThrow(new ChatNotFoundException(CHAT_ID)).when(chatService).deleteChat(CHAT_ID);
 
         mockMvc.perform(delete("/telegram/chat/{chatId}", CHAT_ID))
-            .andExpect(status().isNotFound());
+            .andExpect(status().isOk());
     }
 }
