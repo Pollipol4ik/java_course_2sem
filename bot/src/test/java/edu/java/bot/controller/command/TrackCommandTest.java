@@ -4,7 +4,6 @@ import com.pengrad.telegrambot.request.SendMessage;
 import edu.java.bot.client.ScrapperClient;
 import edu.java.bot.command.TrackCommand;
 import edu.java.bot.dto.AddLinkRequest;
-import edu.java.bot.service.CommandService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -34,7 +33,7 @@ public class TrackCommandTest {
 
         Assertions.assertThat(actual.getParameters().get("text"))
             .isEqualTo(LINK_IS_TRACKED.formatted(command.split(" ")[1]));
-        Mockito.verify(scrapperClient).trackLink(chatId, new AddLinkRequest(command.split(" ")[1]));
+        Mockito.verify(scrapperClient).addLink(chatId, new AddLinkRequest(command.split(" ")[1]));
     }
 
     @Test

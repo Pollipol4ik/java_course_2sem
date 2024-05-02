@@ -31,6 +31,6 @@ public class UpdateCallbackResolver extends UpdateResolver {
             throw new IllegalArgumentException("Invalid callback");
         }
         long linkId = Long.parseLong(data.split(":")[1]);
-        scrapperClient.untrackLink(chatId, new RemoveLinkRequest(linkId));
+        scrapperClient.removeLink(chatId, new RemoveLinkRequest(linkId));
     }
 }

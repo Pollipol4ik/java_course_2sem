@@ -38,7 +38,7 @@ public class UpdateCallbackResolverTest {
 
         SendMessage result = callbackUpdateResolver.resolve(update);
 
-        Mockito.verify(scrapperClient, times(1)).untrackLink(chatId, new RemoveLinkRequest(linkId));
+        Mockito.verify(scrapperClient, times(1)).removeLink(chatId, new RemoveLinkRequest(linkId));
         assertThat(result.getParameters().get("chat_id")).isEqualTo(chatId);
         assertThat(result.getParameters().get("text")).isEqualTo(LINK_HAS_BEEN_UNTRACKED);
     }

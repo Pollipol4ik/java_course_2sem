@@ -32,7 +32,7 @@ public class ListCommand implements CommandExecutor {
     }
 
     private SendMessage buildMessage(long chatId) {
-        ListLinksResponse listLinksResponse = scrapperClient.getAllTrackedLinks(chatId);
+        ListLinksResponse listLinksResponse = scrapperClient.getLinks(chatId);
         List<ResponseLink> links = listLinksResponse.links();
         if (links.isEmpty()) {
             return new SendMessage(chatId, NO_TRACKED_LINKS);

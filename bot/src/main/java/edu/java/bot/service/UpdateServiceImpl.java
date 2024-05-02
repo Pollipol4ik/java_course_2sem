@@ -1,6 +1,6 @@
 package edu.java.bot.service;
 
-import edu.java.bot.dto.request.LinkUpdate;
+import edu.java.bot.dto.UpdateLink;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 @Log4j2
 public class UpdateServiceImpl implements UpdateService {
     @Override
-    public void updateLink(LinkUpdate linkUpdate) {
+    public void updateLink(UpdateLink linkUpdate) {
         log.info("Link was updated");
     }
 }

@@ -1,8 +1,10 @@
 package edu.java.exception;
 
-public class ChatNotFoundException extends RuntimeException {
+import org.springframework.http.HttpStatus;
+
+public class ChatNotFoundException extends BaseException {
 
     public ChatNotFoundException(long chatId) {
-        super(String.format("Chat id = %d not found", chatId));
+        super(String.format("Chat id = %d not found", chatId), HttpStatus.NOT_FOUND);
     }
 }

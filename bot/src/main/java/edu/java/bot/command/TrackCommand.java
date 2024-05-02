@@ -39,7 +39,7 @@ public class TrackCommand implements CommandExecutor {
         if (!splitCommand[1].startsWith(HTTPS_PREFIX) && !splitCommand[1].startsWith(HTTP_PREFIX)) {
             return new SendMessage(chatId, LINK_SHOULD_STARTS_WITH_HTTP);
         }
-        scrapperClient.trackLink(chatId, new AddLinkRequest(splitCommand[1]));
+        scrapperClient.addLink(chatId, new AddLinkRequest(splitCommand[1]));
         return new SendMessage(chatId, LINK_IS_TRACKED.formatted(splitCommand[1]));
     }
 }

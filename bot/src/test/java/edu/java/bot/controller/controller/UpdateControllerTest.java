@@ -29,7 +29,7 @@ public class UpdateControllerTest {
     @SneakyThrows
     public void sendUpdate_shouldReturn200_whenAllIsOk() {
         UpdateLink linkUpdate = new UpdateLink(2, "1", "all", List.of(1L));
-        Mockito.doNothing().when(updateService).sendUpdate(linkUpdate);
+        Mockito.doNothing().when(updateService).updateLink(linkUpdate);
 
         mvc.perform(post("/updates")
                 .contentType("application/json")
