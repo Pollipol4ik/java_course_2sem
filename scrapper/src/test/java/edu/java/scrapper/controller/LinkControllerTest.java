@@ -11,6 +11,7 @@ import edu.java.exception.LinkAlreadyTrackedException;
 import edu.java.exception.LinkNotFoundException;
 import edu.java.exception.UnsupportedLinkTypeException;
 import edu.java.service.LinkService;
+import java.net.URI;
 import java.util.List;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.DisplayName;
@@ -45,7 +46,7 @@ public class LinkControllerTest {
         long linkId = 2312;
         String link = "test.com";
         Mockito.when(linkService.getAllLinks(CHAT_ID))
-            .thenReturn(new ListLinksResponse(List.of(new ResponseLink(linkId, link))));
+            .thenReturn(new ListLinksResponse(List.of(new ResponseLink(linkId, URI.create(link)))));
 
         mvc.perform(get("/links").header("Tg-Chat-Id", CHAT_ID))
             .andExpect(status().isOk())
@@ -70,7 +71,8 @@ public class LinkControllerTest {
         long linkId = 2312;
         String link = "test.com";
         AddLinkRequest addLinkRequest = new AddLinkRequest(link);
-        Mockito.when(linkService.addLink(CHAT_ID, addLinkRequest)).thenReturn(new ResponseLink(linkId, link));
+        Mockito.when(linkService.addLink(CHAT_ID, addLinkRequest))
+            .thenReturn(new ResponseLink(linkId, URI.create(link)));
 
         mvc.perform(post("/links")
                 .header("Tg-Chat-id", CHAT_ID)
@@ -127,7 +129,7 @@ public class LinkControllerTest {
     @DisplayName("LinkController#removeLink basic test")
     public void removeLink_shouldReturnCorrectResponse_whenAllIsCorrect() {
         long linkId = 23;
-        ResponseLink response = new ResponseLink(linkId, "test.com");
+        ResponseLink response = new ResponseLink(linkId, URI.create("test.com"));
         Mockito.when(linkService.removeLink(CHAT_ID, new RemoveLinkRequest(linkId))).thenReturn(response);
 
         mvc.perform(delete("/links")
@@ -136,7 +138,7 @@ public class LinkControllerTest {
                 .content(objectMapper.writeValueAsString(new RemoveLinkRequest(linkId))))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(linkId))
-            .andExpect(jsonPath("$.url").value(response.link()));
+            .andExpect(jsonPath("$.url").value(response.link().toString()));
     }
 
     @Test

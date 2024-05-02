@@ -6,6 +6,7 @@ import edu.java.dto.RemoveLinkRequest;
 import edu.java.dto.ResponseLink;
 import edu.java.exception.LinkAlreadyTrackedException;
 import edu.java.exception.LinkNotFoundException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,7 @@ public class LinkService {
             }
         }
 
-        ResponseLink newLink = new ResponseLink(chatId, addLinkRequest.link());
+        ResponseLink newLink = new ResponseLink(chatId, URI.create(addLinkRequest.link()));
         links.add(newLink);
         return newLink;
     }
