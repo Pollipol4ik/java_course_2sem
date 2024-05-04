@@ -1,9 +1,11 @@
 package edu.java.bot.command;
 
 import com.pengrad.telegrambot.request.SendMessage;
-import edu.java.bot.service.CommandService;
+import edu.java.bot.client.ScrapperClient;
+import edu.java.bot.dto.AddLinkRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.stereotype.Component;
 import static edu.java.bot.command.Command.TRACK;
 import static edu.java.bot.util.MessagesUtils.HTTPS_PREFIX;
 import static edu.java.bot.util.MessagesUtils.HTTP_PREFIX;
@@ -13,48 +15,31 @@ import static edu.java.bot.util.MessagesUtils.TRACK_EXAMPLE;
 
 @Log4j2
 @RequiredArgsConstructor
-public class TrackCommand extends CommandExecutor {
+@Component
+public class TrackCommand implements CommandExecutor {
 
-    private final CommandService service;
+    private final ScrapperClient scrapperClient;
 
     @Override
-    protected SendMessage execute(String command, long chatId) {
-        if (!isTrackCommand(command)) {
-            return executeNext(command, chatId);
-        }
-        log.info("Command /track has executed");
+    public SendMessage execute(String command, long chatId) {
+        log.info("Command /track has been executed");
         return buildMessage(command, chatId);
     }
 
-    private boolean isTrackCommand(String command) {
-        return command.startsWith(TRACK.getName());
+    @Override
+    public String getCommandName() {
+        return TRACK.getName();
     }
 
     private SendMessage buildMessage(String command, long chatId) {
         String[] splitCommand = command.split(" ");
         if (splitCommand.length != 2) {
-            return buildTrackExampleMessage(chatId);
+            return new SendMessage(chatId, TRACK_EXAMPLE);
         }
-        if (!isHttpOrHttpsLink(splitCommand[1])) {
-            return buildLinkStartsWithHttpMessage(chatId);
+        if (!splitCommand[1].startsWith(HTTPS_PREFIX) && !splitCommand[1].startsWith(HTTP_PREFIX)) {
+            return new SendMessage(chatId, LINK_SHOULD_STARTS_WITH_HTTP);
         }
-        service.trackLink(chatId, splitCommand[1]);
-        return buildLinkIsTrackedMessage(chatId, splitCommand[1]);
-    }
-
-    private boolean isHttpOrHttpsLink(String link) {
-        return link.startsWith(HTTPS_PREFIX) || link.startsWith(HTTP_PREFIX);
-    }
-
-    private SendMessage buildTrackExampleMessage(long chatId) {
-        return new SendMessage(chatId, TRACK_EXAMPLE);
-    }
-
-    private SendMessage buildLinkStartsWithHttpMessage(long chatId) {
-        return new SendMessage(chatId, LINK_SHOULD_STARTS_WITH_HTTP);
-    }
-
-    private SendMessage buildLinkIsTrackedMessage(long chatId, String link) {
-        return new SendMessage(chatId, LINK_IS_TRACKED.formatted(link));
+        scrapperClient.addLink(chatId, new AddLinkRequest(splitCommand[1]));
+        return new SendMessage(chatId, LINK_IS_TRACKED.formatted(splitCommand[1]));
     }
 }

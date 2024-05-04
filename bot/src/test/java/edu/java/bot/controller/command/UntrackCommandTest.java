@@ -1,12 +1,12 @@
-package edu.java.bot.command;
-
+package edu.java.bot.controller.command;
 
 import com.pengrad.telegrambot.request.SendMessage;
-import edu.java.bot.dto.Link;
-import edu.java.bot.service.CommandService;
+import edu.java.bot.client.ScrapperClient;
+import edu.java.bot.command.UntrackCommand;
+import edu.java.bot.dto.ListLinksResponse;
+import edu.java.bot.dto.ResponseLink;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ import static edu.java.bot.util.MessagesUtils.NO_TRACKED_LINKS;
 public class UntrackCommandTest {
 
     @Mock
-    private CommandService linkService;
+    private ScrapperClient scrapperClient;
     @InjectMocks
     private UntrackCommand commandExecutor;
 
@@ -31,16 +31,16 @@ public class UntrackCommandTest {
     @DisplayName("UntrackCommandExecutor#execute with tracked links test")
     public void execute_shouldReturnCorrectMessage_whenTrackedLinksExist() {
         long chatId = 1;
-        Mockito.when(linkService.getAllTrackedLinks(chatId)).thenReturn(List.of(
-            new Link(
-                UUID.randomUUID(),
+        Mockito.when(scrapperClient.getLinks(chatId)).thenReturn(new ListLinksResponse(List.of(
+            new ResponseLink(
+                1,
                 "https://github.com/Pollipol4ik"
             ),
-            new Link(
-                UUID.randomUUID(),
+            new ResponseLink(
+                2,
                 "https://stackoverflow.com/questions/77425606/mock-contract-allowance-from-ethers-js-using-jest"
             )
-        ));
+        )));
 
         SendMessage actual = commandExecutor.execute(UNTRACK.getName(), chatId);
 
@@ -52,7 +52,8 @@ public class UntrackCommandTest {
     @DisplayName("UntrackCommandExecutor#execute with no tracked links test")
     public void execute_shouldReturnCorrectMessage_whenNoTrackedLinks() {
         long chatId = 1;
-        Mockito.when(linkService.getAllTrackedLinks(chatId)).thenReturn(Collections.emptyList());
+        Mockito.when(scrapperClient.getLinks(chatId))
+            .thenReturn(new ListLinksResponse(Collections.emptyList()));
 
         SendMessage actual = commandExecutor.execute(UNTRACK.getName(), chatId);
 

@@ -2,8 +2,9 @@ package edu.java.bot.command;
 
 import com.pengrad.telegrambot.model.request.Keyboard;
 import com.pengrad.telegrambot.request.SendMessage;
-import edu.java.bot.dto.Link;
-import edu.java.bot.service.CommandService;
+import edu.java.bot.client.ScrapperClient;
+import edu.java.bot.dto.ListLinksResponse;
+import edu.java.bot.dto.ResponseLink;
 import edu.java.bot.util.KeyboardBuilder;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -12,39 +13,31 @@ import static edu.java.bot.command.Command.LIST;
 import static edu.java.bot.util.MessagesUtils.NO_TRACKED_LINKS;
 import static edu.java.bot.util.MessagesUtils.TRACKED_LINKS;
 
+
 @Log4j2
 @RequiredArgsConstructor
-public class ListCommand extends CommandExecutor {
+public class ListCommand implements CommandExecutor {
 
-    private final CommandService service;
+    private final ScrapperClient scrapperClient;
 
     @Override
-    protected SendMessage execute(String command, long chatId) {
-        if (!isListCommand(command)) {
-            return executeNext(command, chatId);
-        }
-        log.info("Command /list has executed");
+    public SendMessage execute(String command, long chatId) {
+        log.info("Command /list has been executed");
         return buildMessage(chatId);
     }
 
-    private boolean isListCommand(String command) {
-        return LIST.getName().equals(command);
+    @Override
+    public String getCommandName() {
+        return LIST.getName();
     }
 
     private SendMessage buildMessage(long chatId) {
-        List<Link> links = service.getAllTrackedLinks(chatId);
+        ListLinksResponse listLinksResponse = scrapperClient.getLinks(chatId);
+        List<ResponseLink> links = listLinksResponse.links();
         if (links.isEmpty()) {
-            return buildNoTrackedLinksMessage(chatId);
+            return new SendMessage(chatId, NO_TRACKED_LINKS);
         }
-        Keyboard keyboard = KeyboardBuilder.createUrlKeyboard(links);
-        return buildTrackedLinksMessage(chatId, keyboard);
-    }
-
-    private SendMessage buildNoTrackedLinksMessage(long chatId) {
-        return new SendMessage(chatId, NO_TRACKED_LINKS);
-    }
-
-    private SendMessage buildTrackedLinksMessage(long chatId, Keyboard keyboard) {
+        Keyboard keyboard = KeyboardBuilder.buildUrlKeyboard(links);
         return new SendMessage(chatId, TRACKED_LINKS).replyMarkup(keyboard);
     }
 }

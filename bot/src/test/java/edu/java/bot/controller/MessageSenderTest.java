@@ -1,7 +1,7 @@
-package edu.java.bot;
-
+package edu.java.bot.controller;
 
 import com.google.gson.Gson;
+import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
 import edu.java.bot.message_sender.TelegramMessageSender;
@@ -14,14 +14,14 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class TelegramMessageSenderTest {
+public class MessageSenderTest {
 
     private final Gson gson = new Gson();
 
     @Mock
-    private LinkTrackerBot bot;
+    private TelegramBot bot;
     @InjectMocks
-    private TelegramMessageSender messageSenderImpl;
+    private TelegramMessageSender messageSender;
 
     @Test
     @DisplayName("MessageSender#sendMessage")
@@ -29,7 +29,7 @@ public class TelegramMessageSenderTest {
         SendMessage testMessage = new SendMessage(1, "test");
         Mockito.when(bot.execute(testMessage)).thenReturn(getResponse());
 
-        messageSenderImpl.sendMessage(testMessage);
+        messageSender.sendMessage(testMessage);
 
         Mockito.verify(bot).execute(testMessage);
     }
