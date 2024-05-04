@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -18,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
+@DirtiesContext
 public class JpaChatServiceTest extends IntegrationEnvironment {
     @Autowired
     private ChatService chatService;
@@ -32,7 +34,6 @@ public class JpaChatServiceTest extends IntegrationEnvironment {
     static void jpaProperties(DynamicPropertyRegistry registry) {
         registry.add("app.database-access-type", () -> "jpa");
     }
-
     @Test
     @Transactional
     @Rollback
