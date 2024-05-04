@@ -1,15 +1,19 @@
 app:
   scheduler:
     enable: true
-    interval: 10000
-    force-check-delay: 100000
+    interval: 10s
+    force-check-delay: 5s
+  database-access-type: jooq
+
 
 client:
   stackoverflow:
     base-url: https://api.stackexchange.com/2.3/
+    access-token: ${STACKOVERFLOW_ACCESS_TOKEN:}
+    key: ${STACKOVERFLOW_KEY:}
   github:
-    token: ${YOUR_TOKEN:}
-    base-url: https://api.github.com/
+    token: ${TOKEN:}
+    base-url: https://api.github.com/repos
   bot:
     base-url: http://localhost:8090/
 
@@ -22,6 +26,9 @@ spring:
     name: scrapper
   liquibase:
     enabled: false
+  database:
+    check-time-minutes: 0
+    limit: 10
   datasource:
     url: jdbc:postgresql://localhost:15432/scrapper
     username: postgres

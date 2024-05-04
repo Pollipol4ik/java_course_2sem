@@ -8,6 +8,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -19,6 +21,11 @@ public class JdbcChatRepositoryTest extends IntegrationEnvironment {
     @Autowired
     private ChatRepository chatRepository;
 
+    @DynamicPropertySource
+    static void jdbcProperties(DynamicPropertyRegistry registry) {
+        registry.add("app.database-access-type", () -> "jdbc");
+    }
+  
     @Test
     @Transactional
     @Rollback
@@ -60,9 +67,9 @@ public class JdbcChatRepositoryTest extends IntegrationEnvironment {
     public void doesExist_shouldReturnTrue_whenChatIdExists() {
         //Arrange
         long chatId = 1879L;
-        jdbcClient.sql("INSERT INTO chat (id) VALUES (:id)")
-            .param("id", chatId)
-            .update();
+
+        chatRepository.add(chatId);
+
         //Act
         boolean inTable = chatRepository.doesExist(chatId);
         //Assert

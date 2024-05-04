@@ -1,5 +1,6 @@
 app:
-  token: ${YOUR_TOKEN:}
+
+  token: ${TOKEN:}
 
 client:
   scrapper:

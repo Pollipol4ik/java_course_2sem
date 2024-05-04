@@ -12,6 +12,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -25,6 +27,11 @@ public class JdbcChatLinkRepositoryTest extends IntegrationEnvironment {
     @Autowired
     private JdbcClient jdbcClient;
 
+    @DynamicPropertySource
+    static void jdbcProperties(DynamicPropertyRegistry registry) {
+        registry.add("app.database-access-type", () -> "jdbc");
+    }
+
     @Test
     @Transactional
     @Rollback
@@ -34,7 +41,6 @@ public class JdbcChatLinkRepositoryTest extends IntegrationEnvironment {
         long linkId = 1L;
         String url = "google.com";
 
-        // Добавляем запись в таблицу link
         jdbcClient.sql("""
                 INSERT INTO link(id, url, type, updated_at, last_checked_at)
                 VALUES (:id, :url, :link_type, :updated_at, :last_checked_at)""")

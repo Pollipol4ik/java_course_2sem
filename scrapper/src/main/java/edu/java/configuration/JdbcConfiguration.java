@@ -1,36 +1,32 @@
 package edu.java.configuration;
 
-import javax.sql.DataSource;
-import org.springframework.beans.factory.annotation.Value;
+import edu.java.repository.chat.ChatRepository;
+import edu.java.repository.chat.JdbcChatRepository;
+import edu.java.repository.chat_link.ChatLinkRepository;
+import edu.java.repository.chat_link.JdbcChatLinkRepository;
+import edu.java.repository.link.JdbcLinkRepository;
+import edu.java.repository.link.LinkRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.jdbc.core.simple.JdbcClient;
 
 @Configuration
+@ConditionalOnProperty(prefix = "app", name = "database-access-type", havingValue = "jdbc")
 public class JdbcConfiguration {
-    @Value("${spring.datasource.driver-class-name}")
-    private String driver;
-    @Value("${spring.datasource.url}")
-    private String url;
-    @Value("${spring.datasource.username}")
-    private String username;
-    @Value("${spring.datasource.password}")
-    private String password;
-
     @Bean
-    public DataSource getDataSource() {
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName(driver);
-        dataSource.setUrl(url);
-        dataSource.setUsername(username);
-        dataSource.setPassword(password);
-        return dataSource;
+    public ChatRepository jdbcChatRepository(JdbcClient jdbcClient) {
+        return new JdbcChatRepository(jdbcClient);
     }
 
     @Bean
-    public JdbcTemplate getJdbcTemplate() {
-        return new JdbcTemplate(getDataSource());
+    public LinkRepository jdbcLinkRepository(JdbcClient jdbcClient) {
+        return new JdbcLinkRepository(jdbcClient);
     }
 
+    @Bean
+    public ChatLinkRepository jdbcChatLinkRepository(JdbcClient jdbcClient) {
+        return new JdbcChatLinkRepository(jdbcClient);
+    }
 }
+

@@ -4,9 +4,7 @@ import edu.java.dto.Chat;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.simple.JdbcClient;
-import org.springframework.stereotype.Repository;
 
-@Repository
 @RequiredArgsConstructor
 public class JdbcChatRepository implements ChatRepository {
     private static final String PARAM_CHAT_ID = "chatId";

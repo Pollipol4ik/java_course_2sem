@@ -1,13 +1,13 @@
 package edu.java.repository.chat_link;
 
 import edu.java.dto.Chat;
+import edu.java.dto.ChatLinkResponse;
+import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.simple.JdbcClient;
-import org.springframework.stereotype.Repository;
 
 @RequiredArgsConstructor
-@Repository
 public class JdbcChatLinkRepository implements ChatLinkRepository {
 
     private final JdbcClient jdbcClient;
@@ -52,4 +52,16 @@ public class JdbcChatLinkRepository implements ChatLinkRepository {
             .query(Chat.class)
             .list();
     }
+
+    @Override
+    public List<ChatLinkResponse> findAllFiltered(OffsetDateTime time) {
+        return jdbcClient.sql(
+                "SELECT link.id, link.last_checked_at, chat_link.chat_id "
+                    + "FROM link JOIN chat_link ON chat_link.link_id = link.id "
+                    + "WHERE link.last_checked_at < :time "
+                    + "LIMIT 10")
+            .param("time", time).query(ChatLinkResponse.class)
+            .list();
+    }
+
 }

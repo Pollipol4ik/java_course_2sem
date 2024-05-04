@@ -12,9 +12,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.simple.JdbcClient;
-import org.springframework.stereotype.Repository;
 
-@Repository
 @RequiredArgsConstructor
 public class JdbcLinkRepository implements LinkRepository {
 
@@ -65,6 +63,7 @@ public class JdbcLinkRepository implements LinkRepository {
             .update();
     }
 
+    @Override
     public Optional<LinkData> findByUrl(String url) {
         try {
             return Optional.of(jdbcClient.sql(
