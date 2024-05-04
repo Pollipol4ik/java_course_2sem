@@ -1,18 +1,24 @@
 app:
-  telegram-token: //your token must be here
+  token: ${YOUR_TOKEN:}
+
+client:
+  scrapper:
+    base-url: http://localhost:8080/
 
 spring:
   application:
     name: bot
+  liquibase:
+    enabled: false
   jackson:
     time-zone: UTC
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui
 
 server:
   port: 8090
 
 logging:
   config: classpath:log4j2-plain.xml
-
-springdoc:
-  swagger-ui:
-    path: /swagger-ui

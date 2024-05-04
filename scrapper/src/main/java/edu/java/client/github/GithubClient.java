@@ -5,8 +5,10 @@ import edu.java.client.dto.github.RepositoryResponse;
 import edu.java.client.link_information.LastUpdateTime;
 import edu.java.client.link_information.LinkInfoReceiver;
 import edu.java.link_type_resolver.LinkType;
+import java.net.URI;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.springframework.http.HttpHeaders;
 
 public class GithubClient extends AbstractClient<GithubService> implements LinkInfoReceiver {
 
@@ -15,6 +17,10 @@ public class GithubClient extends AbstractClient<GithubService> implements LinkI
 
     public GithubClient() {
         this(DEFAULT_BASE_URL);
+    }
+
+    public GithubClient(String baseUrl, HttpHeaders headers) {
+        super(baseUrl, headers);
     }
 
     public GithubClient(String baseUrl) {
@@ -27,8 +33,8 @@ public class GithubClient extends AbstractClient<GithubService> implements LinkI
     }
 
     @Override
-    public LastUpdateTime receiveLastUpdateTime(String link) {
-        Matcher matcher = REPOSITORY_PATTERN.matcher(link);
+    public LastUpdateTime receiveLastUpdateTime(URI url) {
+        Matcher matcher = REPOSITORY_PATTERN.matcher(url.toString());
         if (!matcher.find()) {
             return null;
         }
@@ -36,5 +42,10 @@ public class GithubClient extends AbstractClient<GithubService> implements LinkI
         String repositoryName = matcher.group(2);
         RepositoryResponse response = service.getRepository(owner, repositoryName);
         return new LastUpdateTime(response.lastUpdate());
+    }
+
+    @Override
+    public boolean isValidate(URI url) {
+        return REPOSITORY_PATTERN.matcher(url.toString()).matches();
     }
 }

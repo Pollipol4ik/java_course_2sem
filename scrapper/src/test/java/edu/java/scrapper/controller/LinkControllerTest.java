@@ -10,7 +10,7 @@ import edu.java.exception.ChatNotFoundException;
 import edu.java.exception.LinkAlreadyTrackedException;
 import edu.java.exception.LinkNotFoundException;
 import edu.java.exception.UnsupportedLinkTypeException;
-import edu.java.service.LinkService;
+import edu.java.service.link.LinkService;
 import java.util.List;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.DisplayName;

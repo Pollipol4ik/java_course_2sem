@@ -1,8 +1,6 @@
 package edu.java.bot.controller;
 
 import edu.java.bot.dto.ApiErrorResponse;
-import java.util.Arrays;
-import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MissingRequestHeaderException;
@@ -22,9 +20,7 @@ public class CustomExceptionHandler {
             "Некорректный запрос",
             "400",
             "Invalid Request",
-            e.getMessage(),
-            Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString)
-                .collect(Collectors.toList())
+            e.getMessage()
         );
     }
 }

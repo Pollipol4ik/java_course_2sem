@@ -40,4 +40,7 @@ public class MessagesUtils {
     public static final String HTTP_PREFIX = "http://";
     public static final String LINK_SHOULD_STARTS_WITH_HTTP =
         "Ссылка должна начинаться с " + HTTPS_PREFIX + " или " + HTTP_PREFIX + "❗";
+    public static final String UNTRACK_ERROR = "Ошибка при отслеживании ссылки";
+    public static final String CHAT_ALREADY_EXIST = "Чат уже существует";
+
 }

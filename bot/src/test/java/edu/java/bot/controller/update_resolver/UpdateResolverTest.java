@@ -12,15 +12,18 @@ import org.junit.jupiter.api.Test;
 
 public class UpdateResolverTest {
 
-    private final UpdateResolver updateResolver =
-        UpdateResolver.link(
-            new UpdateMessageResolver(new CommandChain()),
-            new UpdateCallbackResolver(new ScrapperClient())
-        );
-
     @Test
     @DisplayName("UpdateResolver#resolve with invalid Update test")
     public void test_shouldThrowException_whenUpdateIsInvalid() {
-        Assertions.assertThatThrownBy(() -> updateResolver.resolve(new Update())).isInstanceOf(RuntimeException.class);
+
+        UpdateResolver updateResolver =
+            UpdateResolver.link(
+                new UpdateMessageResolver(new CommandChain()),
+                new UpdateCallbackResolver(new ScrapperClient())
+            );
+
+        Assertions.assertThatThrownBy(() -> updateResolver.resolve(new Update()))
+            .isInstanceOf(RuntimeException.class)
+            .hasMessageContaining("No next resolver available");
     }
 }

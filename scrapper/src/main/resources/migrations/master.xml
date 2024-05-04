@@ -8,4 +8,5 @@
        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
     <include file="2024/03/03_01-create-table-chat.sql"/>
+    <include file="2024/03/03_22-create-table-chat-link.sql"/>
 </databaseChangeLog>
