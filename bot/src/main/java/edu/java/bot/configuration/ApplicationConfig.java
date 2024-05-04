@@ -11,7 +11,10 @@ import org.springframework.validation.annotation.Validated;
 public record ApplicationConfig(
     @NotEmpty
     String token,
-    Retry retry
+    Retry retry,
+    @NotEmpty
+    String topicName,
+    boolean useQueue
 ) {
     @Bean
     public Retry retry() {

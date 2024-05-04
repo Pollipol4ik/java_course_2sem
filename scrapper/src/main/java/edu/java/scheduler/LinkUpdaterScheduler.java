@@ -1,11 +1,11 @@
 package edu.java.scheduler;
 
-import edu.java.client.BotClient;
 import edu.java.client.link_information.LinkInfo;
 import edu.java.client.link_information.LinkInfoReceiver;
 import edu.java.dto.ChatLinkResponse;
 import edu.java.dto.LinkData;
 import edu.java.dto.UpdateLink;
+import edu.java.sender.UpdateSender;
 import edu.java.service.link.LinkService;
 import java.net.URI;
 import java.time.OffsetDateTime;
@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 public class LinkUpdaterScheduler {
     private final List<LinkInfoReceiver> linkInfoReceivers;
-    private final BotClient botClient;
+    private final UpdateSender updateSender;
     private final LinkService linkService;
 
     @Value("${spring.database.check-time-minutes}")
@@ -55,7 +55,7 @@ public class LinkUpdaterScheduler {
                                 info.title(),
                                 linkToChats.tgChatIds().stream().toList()
                             );
-                            botClient.sendUpdate(update);
+                            updateSender.sendUpdate(update);
                         }
                         if (!listLinkInfo.isEmpty()) {
                             OffsetDateTime curTime = OffsetDateTime.now();
