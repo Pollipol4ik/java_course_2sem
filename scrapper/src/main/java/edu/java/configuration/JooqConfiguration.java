@@ -1,12 +1,14 @@
 package edu.java.configuration;
 
-import edu.java.repository.chat.ChatRepository;
+import edu.java.client.link_information.LinkInfoReceiver;
 import edu.java.repository.chat.JooqChatRepository;
-import edu.java.repository.chat_link.ChatLinkRepository;
 import edu.java.repository.chat_link.JooqChatLinkRepository;
 import edu.java.repository.link.JooqLinkRepository;
-import edu.java.repository.link.LinkRepository;
-import org.jooq.DSLContext;
+import edu.java.service.chat.ChatService;
+import edu.java.service.chat.DefaultChatService;
+import edu.java.service.link.DefaultLinkService;
+import edu.java.service.link.LinkService;
+import java.util.List;
 import org.jooq.conf.RenderQuotedNames;
 import org.jooq.impl.DefaultConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -16,7 +18,8 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ConditionalOnProperty(prefix = "app", name = "database-access-type", havingValue = "jooq")
-public class JooqConfig {
+public class JooqConfiguration {
+
     @Bean
     public DefaultConfigurationCustomizer postgresJooqCustomizer() {
         return (DefaultConfiguration c) -> c.settings()
@@ -26,17 +29,17 @@ public class JooqConfig {
     }
 
     @Bean
-    public ChatRepository jooqChatRepository(DSLContext context) {
-        return new JooqChatRepository(context);
+    public ChatService jooqChatService(JooqChatRepository chatRepository) {
+        return new DefaultChatService(chatRepository);
     }
 
     @Bean
-    public LinkRepository jooqLinkRepository(DSLContext context) {
-        return new JooqLinkRepository(context);
-    }
-
-    @Bean
-    public ChatLinkRepository jooqChatLinkRepository(DSLContext context) {
-        return new JooqChatLinkRepository(context);
+    public LinkService jooqLinkService(
+        JooqLinkRepository linkRepository,
+        JooqChatLinkRepository chatLinkRepository,
+        JooqChatRepository chatRepository,
+        List<LinkInfoReceiver> clients
+    ) {
+        return new DefaultLinkService(linkRepository, chatLinkRepository, chatRepository, clients);
     }
 }

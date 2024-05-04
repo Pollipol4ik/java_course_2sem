@@ -4,7 +4,7 @@ import edu.java.dto.AddLinkRequest;
 import edu.java.dto.LinkData;
 import edu.java.dto.ListLinksResponse;
 import edu.java.link_type_resolver.LinkType;
-import edu.java.repository.link.LinkRepository;
+import edu.java.repository.link.JdbcLinkRepository;
 import edu.java.scrapper.IntegrationEnvironment;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
@@ -15,8 +15,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,11 +26,7 @@ public class JdbcLinkRepositoryTest extends IntegrationEnvironment {
     private JdbcClient jdbcClient;
 
     @Autowired
-    private LinkRepository linkRepository;
-    @DynamicPropertySource
-    static void jdbcProperties(DynamicPropertyRegistry registry) {
-        registry.add("app.database-access-type", () -> "jdbc");
-    }
+    private JdbcLinkRepository linkRepository;
 
     @Test
     @Transactional

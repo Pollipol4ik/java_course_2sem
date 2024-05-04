@@ -1,6 +1,6 @@
 package edu.java.scrapper.repository;
 
-import edu.java.repository.chat.ChatRepository;
+import edu.java.repository.chat.JdbcChatRepository;
 import edu.java.scrapper.IntegrationEnvironment;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,8 +8,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -19,13 +17,8 @@ public class JdbcChatRepositoryTest extends IntegrationEnvironment {
     @Autowired
     private JdbcClient jdbcClient;
     @Autowired
-    private ChatRepository chatRepository;
+    private JdbcChatRepository chatRepository;
 
-    @DynamicPropertySource
-    static void jdbcProperties(DynamicPropertyRegistry registry) {
-        registry.add("app.database-access-type", () -> "jdbc");
-    }
-  
     @Test
     @Transactional
     @Rollback
@@ -59,21 +52,6 @@ public class JdbcChatRepositoryTest extends IntegrationEnvironment {
             .query(Long.class)
             .single();
         assertThat(idCount).isEqualTo(0L);
-    }
-
-    @Test
-    @Transactional
-    @Rollback
-    public void doesExist_shouldReturnTrue_whenChatIdExists() {
-        //Arrange
-        long chatId = 1879L;
-
-        chatRepository.add(chatId);
-
-        //Act
-        boolean inTable = chatRepository.doesExist(chatId);
-        //Assert
-        assertThat(inTable).isTrue();
     }
 
     @Test

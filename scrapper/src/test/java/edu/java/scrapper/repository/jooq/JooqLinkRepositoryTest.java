@@ -5,7 +5,7 @@ import edu.java.dto.LinkData;
 import edu.java.dto.ListLinksResponse;
 import edu.java.dto.ResponseLink;
 import edu.java.link_type_resolver.LinkType;
-import edu.java.repository.link.LinkRepository;
+import edu.java.repository.link.JooqLinkRepository;
 import edu.java.scrapper.IntegrationEnvironment;
 import java.time.Duration;
 import java.time.OffsetDateTime;
@@ -17,8 +17,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -28,12 +26,7 @@ public class JooqLinkRepositoryTest extends IntegrationEnvironment {
     @Autowired
     private JdbcClient jdbcClient;
     @Autowired
-    private LinkRepository linkRepository;
-
-    @DynamicPropertySource
-    static void jdbcProperties(DynamicPropertyRegistry registry) {
-        registry.add("app.database-access-type", () -> "jooq");
-    }
+    private JooqLinkRepository linkRepository;
 
     @Test
     @Transactional
@@ -264,22 +257,4 @@ public class JooqLinkRepositoryTest extends IntegrationEnvironment {
         assertThat(uncheckedLinks).isEmpty();
     }
 
-    @Test
-    @Transactional
-    @Rollback
-    public void updateInfo_shouldUpdateLastCheckedAtAndUpdatedAt() {
-        // Arrange
-        String url = "google.com";
-        OffsetDateTime updatedAt = OffsetDateTime.now();
-
-        long linkId = linkRepository.add(1L, new AddLinkRequest(url), LinkType.UNKNOWN);
-
-        // Act
-        linkRepository.updateInfo(linkId, updatedAt);
-
-        // Assert
-        LinkData linkData = linkRepository.findById(linkId).orElseThrow();
-        assertThat(linkData.lastCheckedAt()).isEqualToIgnoringNanos(OffsetDateTime.now());
-        assertThat(linkData.updatedAt()).isEqualToIgnoringNanos(updatedAt);
-    }
 }

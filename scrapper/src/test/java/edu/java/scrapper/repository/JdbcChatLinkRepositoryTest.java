@@ -2,7 +2,7 @@ package edu.java.scrapper.repository;
 
 import edu.java.dto.Chat;
 import edu.java.link_type_resolver.LinkType;
-import edu.java.repository.chat_link.ChatLinkRepository;
+import edu.java.repository.chat_link.JdbcChatLinkRepository;
 import edu.java.scrapper.IntegrationEnvironment;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -12,8 +12,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,15 +20,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class JdbcChatLinkRepositoryTest extends IntegrationEnvironment {
 
     @Autowired
-    private ChatLinkRepository repository;
+    private JdbcChatLinkRepository repository;
 
     @Autowired
     private JdbcClient jdbcClient;
-
-    @DynamicPropertySource
-    static void jdbcProperties(DynamicPropertyRegistry registry) {
-        registry.add("app.database-access-type", () -> "jdbc");
-    }
 
     @Test
     @Transactional
@@ -41,6 +34,7 @@ public class JdbcChatLinkRepositoryTest extends IntegrationEnvironment {
         long linkId = 1L;
         String url = "google.com";
 
+        // Добавляем запись в таблицу link
         jdbcClient.sql("""
                 INSERT INTO link(id, url, type, updated_at, last_checked_at)
                 VALUES (:id, :url, :link_type, :updated_at, :last_checked_at)""")

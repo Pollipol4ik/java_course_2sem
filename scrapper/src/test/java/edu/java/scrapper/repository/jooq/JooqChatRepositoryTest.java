@@ -1,6 +1,6 @@
 package edu.java.scrapper.repository.jooq;
 
-import edu.java.repository.chat.ChatRepository;
+import edu.java.repository.chat.JooqChatRepository;
 import edu.java.scrapper.IntegrationEnvironment;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,8 +8,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -17,14 +15,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DirtiesContext
 public class JooqChatRepositoryTest extends IntegrationEnvironment {
     @Autowired
-    private ChatRepository chatRepository;
+    private JooqChatRepository chatRepository;
     @Autowired
     private JdbcClient jdbcClient;
-
-    @DynamicPropertySource
-    static void jdbcProperties(DynamicPropertyRegistry registry) {
-        registry.add("app.database-access-type", () -> "jooq");
-    }
 
     @Test
     @Transactional

@@ -6,8 +6,10 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.stereotype.Repository;
 
 @RequiredArgsConstructor
+@Repository
 public class JdbcChatLinkRepository implements ChatLinkRepository {
 
     private final JdbcClient jdbcClient;
@@ -62,6 +64,18 @@ public class JdbcChatLinkRepository implements ChatLinkRepository {
                     + "LIMIT 10")
             .param("time", time).query(ChatLinkResponse.class)
             .list();
+    }
+
+    @Override
+    public boolean isTracked(Long chatId, Long linkId) {
+        Integer count = jdbcClient.sql(
+                "SELECT COUNT(*) FROM chat_link WHERE link_id = :link_id AND chat_id = :chat_id")
+            .param("link_id", linkId)
+            .param("chat_id", chatId)
+            .query(Integer.class)
+            .single();
+
+        return count != null && count > 0;
     }
 
 }

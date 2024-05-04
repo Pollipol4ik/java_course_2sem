@@ -1,16 +1,13 @@
-package edu.java.service.chat.jdbc;
+package edu.java.service.chat;
 
 import edu.java.exception.ChatAlreadyRegisteredException;
 import edu.java.exception.ChatNotFoundException;
 import edu.java.repository.chat.ChatRepository;
-import edu.java.service.chat.ChatService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service
 @RequiredArgsConstructor
-public class JdbcChatService implements ChatService {
+public class DefaultChatService implements ChatService {
     private final ChatRepository chatRepository;
 
     @Override
@@ -20,7 +17,6 @@ public class JdbcChatService implements ChatService {
             throw new ChatAlreadyRegisteredException(chatId);
         }
         chatRepository.add(chatId);
-
     }
 
     @Override
@@ -31,5 +27,4 @@ public class JdbcChatService implements ChatService {
         }
         chatRepository.remove(chatId);
     }
-
 }

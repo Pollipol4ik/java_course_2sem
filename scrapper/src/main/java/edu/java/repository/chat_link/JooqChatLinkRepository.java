@@ -10,11 +10,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Repository;
 import static edu.java.repository.jooq.tables.ChatLink.CHAT_LINK;
 import static edu.java.repository.jooq.tables.Link.LINK;
 
 @Log4j2
 @RequiredArgsConstructor
+@Repository
 public class JooqChatLinkRepository implements ChatLinkRepository {
     private final DSLContext context;
     @Value("${spring.database.limit}")
@@ -63,5 +65,11 @@ public class JooqChatLinkRepository implements ChatLinkRepository {
             .stream()
             .map(entry -> new ChatLinkResponse(entry.getKey(), new HashSet<>(entry.getValue())))
             .toList();
+    }
+
+    @Override
+    public boolean isTracked(Long chatId, Long linkId) {
+        long count = context.fetchCount(CHAT_LINK, CHAT_LINK.LINK_ID.eq(linkId).and(CHAT_LINK.CHAT_ID.eq(chatId)));
+        return count > 0;
     }
 }

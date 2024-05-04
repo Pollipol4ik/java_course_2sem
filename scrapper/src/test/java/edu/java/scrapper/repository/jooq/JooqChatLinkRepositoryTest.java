@@ -1,7 +1,7 @@
 package edu.java.scrapper.repository.jooq;
 
 import edu.java.link_type_resolver.LinkType;
-import edu.java.repository.chat_link.ChatLinkRepository;
+import edu.java.repository.chat_link.JooqChatLinkRepository;
 import edu.java.scrapper.IntegrationEnvironment;
 import java.time.OffsetDateTime;
 import org.junit.jupiter.api.Test;
@@ -10,8 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,12 +20,7 @@ public class JooqChatLinkRepositoryTest extends IntegrationEnvironment {
     private JdbcClient jdbcClient;
 
     @Autowired
-    private ChatLinkRepository chatLinkRepository;
-
-    @DynamicPropertySource
-    static void jdbcProperties(DynamicPropertyRegistry registry) {
-        registry.add("app.database-access-type", () -> "jooq");
-    }
+    private JooqChatLinkRepository jooqChatLinkRepository;
 
     @Transactional
     @Rollback
@@ -51,7 +44,7 @@ public class JooqChatLinkRepositoryTest extends IntegrationEnvironment {
             .update();
 
         //Act
-        chatLinkRepository.add(chatId, linkId);
+        jooqChatLinkRepository.add(chatId, linkId);
         //Assert
         Boolean hasBeenAdded =
             jdbcClient.sql("SELECT COUNT(*) FROM chat_link WHERE link_id = :linkId AND chat_id = :chatId")
@@ -86,7 +79,7 @@ public class JooqChatLinkRepositoryTest extends IntegrationEnvironment {
             .update();
 
         // Act
-        chatLinkRepository.add(linkId, chatId);
+        jooqChatLinkRepository.add(linkId, chatId);
 
         // Assert
         Long count = jdbcClient.sql("SELECT COUNT(*) FROM chat_link WHERE link_id = :linkId AND chat_id = :chatId")

@@ -12,8 +12,10 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.stereotype.Repository;
 
 @RequiredArgsConstructor
+@Repository
 public class JdbcLinkRepository implements LinkRepository {
 
     private final JdbcClient jdbcClient;

@@ -6,8 +6,7 @@ import edu.java.client.link_information.LinkInfoReceiver;
 import edu.java.dto.ChatLinkResponse;
 import edu.java.dto.LinkData;
 import edu.java.dto.UpdateLink;
-import edu.java.repository.chat_link.ChatLinkRepository;
-import edu.java.repository.link.LinkRepository;
+import edu.java.service.link.LinkService;
 import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.Comparator;
@@ -25,8 +24,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class LinkUpdaterScheduler {
     private final List<LinkInfoReceiver> linkInfoReceivers;
     private final BotClient botClient;
-    private final LinkRepository linkRepository;
-    private final ChatLinkRepository chatLinkRepository;
+    private final LinkService linkService;
+
     @Value("${spring.database.check-time-minutes}")
     private int minutesCheckTime;
 
@@ -35,12 +34,12 @@ public class LinkUpdaterScheduler {
     public void update() {
         OffsetDateTime time = OffsetDateTime.now();
         time = time.minusMinutes(minutesCheckTime);
-        List<ChatLinkResponse> linksToChats = chatLinkRepository.findAllFiltered(time);
+        List<ChatLinkResponse> linksToChats = linkService.findAllChatsByLinksFiltered(time);
         if (linksToChats != null) {
             log.info(linksToChats);
             for (ChatLinkResponse linkToChats : linksToChats) {
                 Long linkId = linkToChats.linkId();
-                LinkData data = linkRepository.findById(linkId).get();
+                LinkData data = linkService.findById(linkId).get();
                 for (LinkInfoReceiver client : linkInfoReceivers) {
                     if (client.isValidate(URI.create(data.url()))) {
                         List<LinkInfo> listLinkInfo = client.receiveLastUpdateTime(URI.create(data.url()))
@@ -60,7 +59,7 @@ public class LinkUpdaterScheduler {
                         }
                         if (!listLinkInfo.isEmpty()) {
                             OffsetDateTime curTime = OffsetDateTime.now();
-                            linkRepository.updateInfo(
+                            linkService.updateInfo(
                                 linkId,
                                 curTime
                             );
